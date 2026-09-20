@@ -1,0 +1,15 @@
+{
+  "pending_actions": [],
+  "flagged": [],
+  "commitments": [
+    {
+      "date": "2026-09-18",
+      "time": "10:00",
+      "title": "Quarterly board review",
+      "source_ids": [
+        "m038"
+      ]
+    }
+  ],
+  "conflicts": []
+}

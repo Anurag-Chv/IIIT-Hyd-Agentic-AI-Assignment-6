@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>InboxHero Dashboard</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 30px; }
+.panes { display: flex; gap: 20px; }
+.pane { flex: 1; border: 1px solid #ccc; padding: 15px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background: #f2f2f2; }
+</style>
+</head>
+<body>
+<h1>InboxHero Dashboard</h1>
+
+<div class="panes">
+
+<div class="pane">
+<h2>Pending Actions</h2>
+<table>
+<tr><th>Message</th><th>Action</th><th>Why</th></tr>
+
+</table>
+</div>
+
+<div class="pane">
+<h2>Flagged</h2>
+<table>
+<tr><th>Message</th><th>Attempted</th><th>What happened</th></tr>
+
+</table>
+</div>
+
+<div class="pane">
+<h2>Commitments</h2>
+<table>
+<tr><th>Date</th><th>Time</th><th>Commitment</th><th>Sources</th></tr>
+<tr><td>2026-09-18</td><td>10:00</td><td>Quarterly board review</td><td>m038</td></tr>
+</table>
+<h3>Conflicts</h3>
+<p>No conflicts detected.</p>
+</div>
+
+</div>
+</body>
+</html>
