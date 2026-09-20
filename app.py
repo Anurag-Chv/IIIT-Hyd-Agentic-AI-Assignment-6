@@ -1,133 +1,113 @@
 """
-App module for SkyVault Agent (Assignment 5).
-Runs unit tests for each tool and provides a manual demo mode.
-Now also includes MCPClient/MCPServer integration tests.
+Tests for InboxHero tools, memory and MCP integration.
 """
 
 import sys
 import unittest
 from pathlib import Path
 
-# Add Common/ folder to path
+# Add Common/ to the Python path
 sys.path.insert(0, str(Path(__file__).resolve().parent / "Common"))
 
+from data import (
+    load_inbox,
+    get_message,
+    get_thread,
+    search_messages,
+    get_unread_messages,
+)
 from tools import (
-    find_available_gate,
-    get_flight_status,
-    get_weather,
-    lookup_aircraft,
-    maintenance_history,
-    search_passenger,
+    get_inbox_summary,
+    record_disposition,
+    get_disposition,
+    get_undecided_messages,
     remember,
     recall,
 )
-
 from mcp_server import MCPServer, ToolRegistry
 from mcp_client import MCPClient
 
 
-class TestGetFlightStatus(unittest.TestCase):
-    def test_known_flight(self):
-        result = get_flight_status("AI101")
-        self.assertEqual(result["status"], "On Time")
-        self.assertEqual(result["gate"], "A12")
-        self.assertEqual(result["departure_time"], "08:30")
-        self.assertEqual(result["delay_minutes"], 0)
+class TestInboxData(unittest.TestCase):
 
-    def test_delayed_flight(self):
-        result = get_flight_status("uk873")
-        self.assertEqual(result["status"], "Delayed")
-        self.assertEqual(result["delay_minutes"], 45)
+    def test_load_inbox(self):
+        messages = load_inbox()
+        self.assertEqual(len(messages), 100)
 
-    def test_cancelled_flight(self):
-        result = get_flight_status("SG8152")
-        self.assertEqual(result["status"], "Cancelled")
-        self.assertIsNone(result["gate"])
+    def test_get_message(self):
+        message = get_message("m003")
+        self.assertIsNotNone(message)
+        self.assertEqual(message["id"], "m003")
 
-    def test_unknown_flight(self):
-        result = get_flight_status("XX999")
-        self.assertIn("message", result)
+    def test_unknown_message(self):
+        message = get_message("m999")
+        self.assertIsNone(message)
 
+    def test_get_thread(self):
+        thread = get_thread("t-launch")
+        self.assertGreater(len(thread), 1)
+        self.assertEqual(thread[0]["thread_id"], "t-launch")
 
-class TestSearchPassenger(unittest.TestCase):
-    def test_known_passenger(self):
-        result = search_passenger("Rahul Sharma")
-        self.assertEqual(result["booking_reference"], "AI7K2M")
-        self.assertEqual(result["seat"], "14A")
+    def test_search_messages(self):
+        results = search_messages("board review")
+        self.assertGreater(len(results), 0)
 
-    def test_case_insensitive(self):
-        result = search_passenger("priya nair")
-        self.assertEqual(result["destination"], "Bangalore")
-
-    def test_unknown_passenger(self):
-        result = search_passenger("Nobody")
-        self.assertIn("message", result)
+    def test_get_unread_messages(self):
+        messages = get_unread_messages()
+        self.assertGreater(len(messages), 0)
 
 
-class TestMaintenanceHistory(unittest.TestCase):
-    def test_no_issues(self):
-        result = maintenance_history("VT-ABC")
-        self.assertEqual(result["outstanding_issues"], [])
+class TestInboxTools(unittest.TestCase):
 
-    def test_with_issues(self):
-        result = maintenance_history("vt-vst")
-        self.assertEqual(len(result["outstanding_issues"]), 1)
+    def test_inbox_summary(self):
+        result = get_inbox_summary()
+        self.assertEqual(result["total_messages"], 100)
+        self.assertIn("unread_messages", result)
 
-    def test_unknown_tail(self):
-        result = maintenance_history("VT-XXX")
-        self.assertIn("message", result)
+    def test_record_disposition(self):
+        result = record_disposition(
+            "m051",
+            "defer",
+            "Personal message that does not need immediate action.",
+        )
 
+        self.assertEqual(result["message_id"], "m051")
+        self.assertEqual(result["disposition"], "defer")
 
-class TestFindAvailableGate(unittest.TestCase):
-    def test_terminal_t3(self):
-        result = find_available_gate("T3")
-        self.assertEqual(result["gate"], "A10")
+    def test_get_disposition(self):
+        result = get_disposition("m051")
+        self.assertEqual(result["disposition"], "defer")
 
-    def test_terminal_without_prefix(self):
-        result = find_available_gate("2")
-        self.assertEqual(result["gate"], "B5")
+    def test_invalid_disposition(self):
+        result = record_disposition(
+            "m051",
+            "invalid_action",
+            "Test",
+        )
 
-    def test_unknown_terminal(self):
-        result = find_available_gate("T9")
-        self.assertIn("message", result)
+        self.assertIn("error", result)
 
-
-class TestGetWeather(unittest.TestCase):
-    def test_airport_code(self):
-        result = get_weather("DEL")
-        self.assertEqual(result["temperature_c"], 32)
-
-    def test_city_name(self):
-        result = get_weather("Mumbai")
-        self.assertEqual(result["temperature_c"], 29)
-
-    def test_unknown_airport(self):
-        result = get_weather("XYZ")
-        self.assertIn("message", result)
+    def test_undecided_messages(self):
+        result = get_undecided_messages()
+        self.assertIsInstance(result, list)
 
 
-class TestLookupAircraft(unittest.TestCase):
-    def test_known_aircraft(self):
-        result = lookup_aircraft("A320")
-        self.assertEqual(result["capacity"], 180)
+class TestMemory(unittest.TestCase):
 
-    def test_regional_aircraft(self):
-        result = lookup_aircraft("ATR 72")
-        self.assertEqual(result["capacity"], 78)
-
-    def test_unknown_aircraft(self):
-        result = lookup_aircraft("A380")
-        self.assertIn("message", result)
-
-
-class TestMemoryTools(unittest.TestCase):
     def test_remember_and_recall(self):
-        remember("preferred_terminal", "T2", "test")
-        result = recall("preferred_terminal")
-        self.assertEqual(result["value"], "T2")
+        remember(
+            "test_preference",
+            "Test value",
+            "unit-test",
+        )
+
+        result = recall("test_preference")
+
+        self.assertEqual(result["value"], "Test value")
 
 
 class TestMCPIntegration(unittest.TestCase):
+
     def setUp(self):
         registry = ToolRegistry()
         server = MCPServer(registry)
@@ -135,50 +115,45 @@ class TestMCPIntegration(unittest.TestCase):
 
     def test_initialize(self):
         self.assertIn("result", self.client.init_response)
-        self.assertEqual(self.client.init_response["result"]["server_name"], "SkyVault MCPServer")
+        self.assertEqual(
+            self.client.init_response["result"]["server_name"],
+            "InboxHero MCPServer",
+        )
 
     def test_list_tools(self):
         tools = self.client.list_tools()
-        names = [t["name"] for t in tools]
-        self.assertIn("get_flight_status", names)
+        names = [tool["name"] for tool in tools]
+
+        self.assertIn("get_message", names)
+        self.assertIn("get_thread", names)
+        self.assertIn("search_messages", names)
         self.assertIn("remember", names)
 
     def test_call_tool(self):
-        result = self.client.call_tool("find_available_gate", {"terminal": "T2"})
-        self.assertIn("gate", result)
+        result = self.client.call_tool(
+            "get_message",
+            {"message_id": "m003"},
+        )
 
+        self.assertEqual(result["id"], "m003")
 
-def run_demo():
-    """Manual demo: print sample outputs for each tool and MCP calls."""
-    print("=" * 60)
-    print("SkyVault tools – demo run")
-    print("=" * 60)
+    def test_call_memory_tool(self):
+        self.client.call_tool(
+            "remember",
+            {
+                "key": "mcp_test",
+                "value": "works",
+                "source": "test",
+            },
+        )
 
-    demos = [
-        ("get_flight_status('AI101')", get_flight_status("AI101")),
-        ("search_passenger('Rahul Sharma')", search_passenger("Rahul Sharma")),
-        ("maintenance_history('VT-VST')", maintenance_history("VT-VST")),
-        ("find_available_gate('T3')", find_available_gate("T3")),
-        ("get_weather('DEL')", get_weather("DEL")),
-        ("lookup_aircraft('B737-800')", lookup_aircraft("B737-800")),
-        ("remember('preferred_terminal','T2')", remember("preferred_terminal", "T2")),
-        ("recall('preferred_terminal')", recall("preferred_terminal")),
-    ]
+        result = self.client.call_tool(
+            "recall",
+            {"query": "mcp_test"},
+        )
 
-    for label, result in demos:
-        print(f"\n{label}")
-        print(f"  -> {result}")
-
-    print("\n=== MCP Demo ===")
-    registry = ToolRegistry()
-    server = MCPServer(registry)
-    client = MCPClient(server)
-    result = client.call_tool("find_available_gate", {"terminal": "T2"})
-    print("MCP call result:", result)
+        self.assertEqual(result["value"], "works")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "demo":
-        run_demo()
-    else:
-        unittest.main()
+    unittest.main()
