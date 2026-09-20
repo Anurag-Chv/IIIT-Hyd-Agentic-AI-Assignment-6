@@ -1,50 +1,39 @@
 """
-Main entry point for SkyVault Agent.
-Now routes all tool calls through MCPClient/MCPServer (JSON-RPC).
-Demonstrates planning, tool usage, memory persistence, and reflection.
+Main entry point for InboxHero.
 
 Usage:
-    python main.py          # run demo queries
-    python main.py --chat   # start interactive chat loop
+    python main.py          # run a small demo
+    python main.py --chat   # start interactive chat
 """
 
 import sys
+
 from agent import ask
 
 
-def run_demos():
-    """Run a few sample queries to show how the agent works."""
-    print("=== Demo 1: Flight status (via MCP) ===")
-    answer = ask("What is the status of flight AI101?")
-    print("Answer:", answer)
+def run_demo():
+    """Run a few simple InboxHero queries."""
+    print("=== InboxHero Demo ===")
 
-    print("\n=== Demo 2: Passenger lookup (via MCP) ===")
-    answer = ask("Find the booking details for passenger Rahul Sharma.")
-    print("Answer:", answer)
-
-    print("\n=== Demo 3: Multi-step operations (via MCP) ===")
     answer = ask(
-        "Flight UK873 is scheduled from Delhi. "
-        "What is the weather at DEL, the flight status, "
-        "and the maintenance record for aircraft VT-VST?"
+        "Give me a summary of the inbox and tell me what needs attention."
     )
     print("Answer:", answer)
 
-    print("\n=== Demo 4: Memory persistence (via MCP) ===")
-    answer = ask("I usually work Terminal 2, remember that.")
-    print("Answer:", answer)
-
-    print("\n=== Demo 5: Recall fact and use in tool call (via MCP) ===")
-    answer = ask("Find me an open gate.")  # should recall Terminal 2 automatically
+    print("\n=== Search Demo ===")
+    answer = ask(
+        "Find messages related to the board review."
+    )
     print("Answer:", answer)
 
 
 def chat():
-    """Interactive chat loop with the SkyVault Agent."""
-    print("SkyVault Agent | type 'quit' or 'exit' to leave\n")
+    """Start an interactive InboxHero chat."""
+    print("InboxHero | type 'quit' or 'exit' to leave\n")
 
     while True:
         user_input = input("You: ").strip()
+
         if not user_input:
             continue
 
@@ -57,11 +46,11 @@ def chat():
 
 
 def main():
-    """Decide whether to run demo mode or chat mode."""
+    """Run demo mode or interactive mode."""
     if len(sys.argv) > 1 and sys.argv[1] == "--chat":
         chat()
     else:
-        run_demos()
+        run_demo()
 
 
 if __name__ == "__main__":
