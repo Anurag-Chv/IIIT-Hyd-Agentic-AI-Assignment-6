@@ -1,90 +1,61 @@
-"""
-MCP client for InboxHero.
-Sends initialize, tools/list and tools/call requests to the MCP server.
-"""
-
 import uuid
 
 from mcp_server import MCPServer, ToolRegistry
 
 
 class MCPClient:
-    """Simple client for communicating with the MCP server."""
-
     def __init__(self, server: MCPServer):
         self.server = server
         self.protocol_version = "2.0"
-        self.client_name = "InboxHero MCPClient"
 
-        # Initialize the connection
+        self.init_response = self._send(
+            "initialize",
+            {"client_name": "InboxHero MCPClient"},
+        )
+
+    def _send(self, method, params=None):
         request = {
             "jsonrpc": self.protocol_version,
             "id": str(uuid.uuid4()),
-            "method": "initialize",
-            "params": {"client_name": self.client_name},
+            "method": method,
+            "params": params or {},
         }
 
-        self.init_response = self.server.handle(request)
+        response = self.server.handle(request)
+
+        if "error" in response:
+            raise RuntimeError(response["error"])
+
+        return response["result"]
 
     def list_tools(self):
-        """Get the tools exposed by the server."""
-        request = {
-            "jsonrpc": self.protocol_version,
-            "id": str(uuid.uuid4()),
-            "method": "tools/list",
-            "params": {},
-        }
+        return self._send("tools/list")
 
-        response = self.server.handle(request)
-
-        if "error" in response:
-            raise RuntimeError(
-                f"Error listing tools: {response['error']}"
-            )
-
-        return response["result"]
-
-    def call_tool(self, name: str, arguments: dict):
-        """Call a tool through the MCP server."""
-        request = {
-            "jsonrpc": self.protocol_version,
-            "id": str(uuid.uuid4()),
-            "method": "tools/call",
-            "params": {
+    def call_tool(self, name, arguments=None):
+        return self._send(
+            "tools/call",
+            {
                 "fname": name,
-                "arguments": arguments,
+                "arguments": arguments or {},
             },
-        }
-
-        response = self.server.handle(request)
-
-        if "error" in response:
-            raise RuntimeError(
-                f"Error calling tool {name}: {response['error']}"
-            )
-
-        return response["result"]
+        )
 
 
 if __name__ == "__main__":
-    registry = ToolRegistry()
-    server = MCPServer(registry)
-    client = MCPClient(server)
+    client = MCPClient(MCPServer(ToolRegistry()))
 
     print("=== Initialize ===")
     print(client.init_response)
 
     print("\n=== Tools ===")
-    for tool in client.list_tools():
-        print(tool["name"])
+    for item in client.list_tools():
+        print(item["name"])
 
     print("\n=== Inbox Summary ===")
-    result = client.call_tool("get_inbox_summary", {})
-    print(result)
+    print(client.call_tool("get_inbox_summary"))
 
     print("\n=== Search ===")
-    result = client.call_tool(
+    print(client.call_tool(
         "search_messages",
         {"query": "board review"},
-    )
-    print(result)
+    ))
