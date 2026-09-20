@@ -1,36 +1,14 @@
-"""
-LLM client wrapper for InboxHero.
-
-Supports:
-- Ollama (local development)
-- Google Gemini
-
-The provider and model are configured through config.py.
-"""
-
 import json
-import sys
 import urllib.error
 import urllib.request
-from pathlib import Path
-
-# Add project root to path so imports work
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import config
 
 
-# Keep a single client instance for providers that require one.
 _client = None
 
 
 def get_client():
-    """
-    Return the provider client.
-
-    Ollama uses its HTTP API directly, so no Python client object is required.
-    Gemini uses the Google GenAI client.
-    """
     global _client
 
     if config.LLM_PROVIDER == "google":
@@ -43,60 +21,36 @@ def get_client():
         return _client
 
     if config.LLM_PROVIDER == "ollama":
-        # Ollama is accessed through its local HTTP API.
         return None
 
     raise RuntimeError(
-        f"Unsupported LLM_PROVIDER: {config.LLM_PROVIDER}. "
-        "Use 'ollama' or 'google'."
+        f"Unsupported LLM_PROVIDER: {config.LLM_PROVIDER}"
     )
 
 
-def chat(prompt: str, system: str = None, temperature: float = None) -> str:
-    """
-    Send a single user prompt with an optional system instruction.
-
-    Returns the model's text response.
-    """
-    if temperature is None:
-        temperature = config.MODEL_TEMPERATURE
-
+def chat(prompt, system=None, temperature=None):
     messages = []
 
     if system:
-        messages.append(
-            {
-                "role": "system",
-                "content": system,
-            }
-        )
+        messages.append({
+            "role": "system",
+            "content": system,
+        })
 
-    messages.append(
-        {
-            "role": "user",
-            "content": prompt,
-        }
+    messages.append({
+        "role": "user",
+        "content": prompt,
+    })
+
+    return chat_messages(messages, temperature)
+
+
+def chat_messages(messages, temperature=None):
+    temperature = (
+        config.MODEL_TEMPERATURE
+        if temperature is None
+        else temperature
     )
-
-    return chat_messages(messages, temperature=temperature)
-
-
-def chat_messages(messages: list, temperature: float = None) -> str:
-    """
-    Send a list of messages to the configured LLM provider.
-
-    Expected message format:
-
-    [
-        {"role": "system", "content": "..."},
-        {"role": "user", "content": "..."},
-        {"role": "assistant", "content": "..."}
-    ]
-
-    Returns the model's text response.
-    """
-    if temperature is None:
-        temperature = config.MODEL_TEMPERATURE
 
     if config.LLM_PROVIDER == "ollama":
         return _chat_ollama(messages, temperature)
@@ -105,74 +59,55 @@ def chat_messages(messages: list, temperature: float = None) -> str:
         return _chat_google(messages, temperature)
 
     raise RuntimeError(
-        f"Unsupported LLM_PROVIDER: {config.LLM_PROVIDER}. "
-        "Use 'ollama' or 'google'."
+        f"Unsupported LLM_PROVIDER: {config.LLM_PROVIDER}"
     )
 
 
-def _chat_ollama(messages: list, temperature: float) -> str:
-    """
-    Send messages to the locally running Ollama server.
-    """
+def _chat_ollama(messages, temperature):
     payload = {
         "model": config.MODEL_NAME,
         "messages": messages,
         "stream": False,
-        "options": {
-            "temperature": temperature,
-        },
+        "options": {"temperature": temperature},
     }
 
     request = urllib.request.Request(
-        url=f"{config.OLLAMA_BASE_URL.rstrip('/')}/api/chat",
+        f"{config.OLLAMA_BASE_URL.rstrip('/')}/api/chat",
         data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "Content-Type": "application/json",
-        },
+        headers={"Content-Type": "application/json"},
         method="POST",
     )
 
     try:
         with urllib.request.urlopen(request, timeout=120) as response:
-            response_data = json.loads(
-                response.read().decode("utf-8")
-            )
+            data = json.loads(response.read().decode("utf-8"))
 
     except urllib.error.HTTPError as exc:
-        error_body = exc.read().decode("utf-8", errors="replace")
-
+        body = exc.read().decode("utf-8", errors="replace")
         raise RuntimeError(
-            f"Ollama HTTP error {exc.code}: {error_body}"
+            f"Ollama HTTP error {exc.code}: {body}"
         ) from exc
 
     except urllib.error.URLError as exc:
         raise RuntimeError(
-            "Could not connect to Ollama at "
-            f"{config.OLLAMA_BASE_URL}. "
-            "Make sure Ollama is running and the configured model "
-            f"'{config.MODEL_NAME}' is available."
+            f"Could not connect to Ollama at {config.OLLAMA_BASE_URL}. "
+            f"Make sure '{config.MODEL_NAME}' is available."
         ) from exc
 
     except json.JSONDecodeError as exc:
         raise RuntimeError(
-            "Ollama returned an invalid JSON response."
+            "Ollama returned invalid JSON."
         ) from exc
 
-    message = response_data.get("message", {})
-    content = message.get("content", "")
+    content = data.get("message", {}).get("content", "")
 
     if not content:
-        raise RuntimeError(
-            f"Ollama returned no model content: {response_data}"
-        )
+        raise RuntimeError("Ollama returned no model content.")
 
     return content.strip()
 
 
-def _chat_google(messages: list, temperature: float) -> str:
-    """
-    Send messages to Google Gemini using the Google GenAI SDK.
-    """
+def _chat_google(messages, temperature):
     from google.genai import types
 
     system_parts = []
@@ -184,43 +119,28 @@ def _chat_google(messages: list, temperature: float) -> str:
 
         if role == "system":
             system_parts.append(text)
-
-        elif role == "assistant":
-            contents.append(
-                types.Content(
-                    role="model",
-                    parts=[types.Part(text=text)],
-                )
-            )
-
         else:
             contents.append(
                 types.Content(
-                    role="user",
+                    role="model" if role == "assistant" else "user",
                     parts=[types.Part(text=text)],
                 )
             )
 
-    generate_config = {
+    config_data = {
         "temperature": temperature,
         "automatic_function_calling": (
-            types.AutomaticFunctionCallingConfig(
-                disable=True
-            )
+            types.AutomaticFunctionCallingConfig(disable=True)
         ),
     }
 
     if system_parts:
-        generate_config["system_instruction"] = "\n\n".join(
-            system_parts
-        )
+        config_data["system_instruction"] = "\n\n".join(system_parts)
 
     response = get_client().models.generate_content(
         model=config.MODEL_NAME,
         contents=contents,
-        config=types.GenerateContentConfig(
-            **generate_config
-        ),
+        config=types.GenerateContentConfig(**config_data),
     )
 
     if not response.text:
