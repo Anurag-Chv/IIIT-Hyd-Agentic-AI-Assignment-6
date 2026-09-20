@@ -1,11 +1,8 @@
 """
-InboxHero tools.
+Tools used by InboxHero.
 
-These tools provide inbox retrieval, search, persistent memory,
-disposition recording, and reversible message actions.
-
-Irreversible actions such as send/delete are intentionally not
-implemented here. They will be added behind the safety gate.
+Inbox tools handle retrieval and search, while actions.py contains
+the send/delete operations that are protected by the safety gate.
 """
 
 import json
@@ -13,6 +10,7 @@ from datetime import datetime
 from pathlib import Path
 
 import memory
+from actions import send_message, delete_message
 from Common.data import (
     get_message,
     get_thread,
@@ -22,19 +20,11 @@ from Common.data import (
 )
 
 
-# ------------------------------------------------------------------
-# Project paths
-# ------------------------------------------------------------------
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 DECISIONS_FILE = PROJECT_ROOT / "decisions.json"
 MESSAGE_STATE_FILE = PROJECT_ROOT / "message_state.json"
 
-
-# ------------------------------------------------------------------
-# Constants
-# ------------------------------------------------------------------
 
 VALID_DISPOSITIONS = {
     "reply",
@@ -43,7 +33,6 @@ VALID_DISPOSITIONS = {
     "delegate",
     "escalate",
 }
-
 
 VALID_REVERSIBLE_ACTIONS = {
     "draft",
@@ -54,12 +43,8 @@ VALID_REVERSIBLE_ACTIONS = {
 }
 
 
-# ------------------------------------------------------------------
-# Internal JSON helpers
-# ------------------------------------------------------------------
-
 def _load_json(file_path: Path, default):
-    """Load JSON from disk or return the supplied default."""
+    """Load a JSON file or return the default value."""
     if not file_path.exists():
         return default
 
@@ -71,70 +56,50 @@ def _load_json(file_path: Path, default):
 
 
 def _save_json(file_path: Path, data):
-    """Save JSON to disk."""
+    """Save data as JSON."""
     with file_path.open("w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
 
-# ------------------------------------------------------------------
-# Inbox retrieval tools
-# ------------------------------------------------------------------
+# Inbox retrieval
 
 def list_messages() -> list:
-    """
-    Return all messages in the inbox.
-    """
+    """Return all inbox messages."""
     return load_inbox()
 
 
 def get_message_by_id(message_id: str) -> dict:
-    """
-    Retrieve a single message by ID.
-    """
+    """Return one message by ID."""
     message = get_message(message_id)
 
     if message is None:
-        return {
-            "message": f"No message found with ID {message_id}."
-        }
+        return {"message": f"No message found with ID {message_id}."}
 
     return message
 
 
 def get_email_thread(thread_id: str) -> list:
-    """
-    Retrieve all messages in a thread in timestamp order.
-    """
+    """Return all messages in a thread."""
     thread = get_thread(thread_id)
 
     if not thread:
-        return [
-            {
-                "message": f"No thread found with ID {thread_id}."
-            }
-        ]
+        return [{"message": f"No thread found with ID {thread_id}."}]
 
     return thread
 
 
 def search_inbox(query: str) -> list:
-    """
-    Search sender, recipient, subject, and body text.
-    """
+    """Search the inbox by sender, recipient, subject or body."""
     return search_messages(query)
 
 
 def list_unread_messages() -> list:
-    """
-    Return all unread messages.
-    """
+    """Return unread messages."""
     return get_unread_messages()
 
 
 def get_inbox_summary() -> dict:
-    """
-    Return basic inbox statistics.
-    """
+    """Return basic inbox counts."""
     messages = load_inbox()
 
     unread_count = sum(
@@ -148,21 +113,14 @@ def get_inbox_summary() -> dict:
     }
 
 
-# ------------------------------------------------------------------
-# Disposition tools
-# ------------------------------------------------------------------
+# Dispositions
 
 def record_disposition(
     message_id: str,
     disposition: str,
     reason: str,
 ) -> dict:
-    """
-    Assign exactly one disposition and reason to a message.
-
-    Existing decisions for the same message are replaced so that
-    each message has one current disposition.
-    """
+    """Record one disposition and reason for a message."""
     disposition = disposition.lower().strip()
 
     if disposition not in VALID_DISPOSITIONS:
@@ -173,12 +131,8 @@ def record_disposition(
             )
         }
 
-    message = get_message(message_id)
-
-    if message is None:
-        return {
-            "error": f"No message found with ID {message_id}."
-        }
+    if get_message(message_id) is None:
+        return {"error": f"No message found with ID {message_id}."}
 
     decisions = _load_json(DECISIONS_FILE, {})
 
@@ -198,11 +152,8 @@ def record_disposition(
 
 
 def get_disposition(message_id: str) -> dict:
-    """
-    Retrieve the current disposition for a message.
-    """
+    """Return the current disposition for a message."""
     decisions = _load_json(DECISIONS_FILE, {})
-
     decision = decisions.get(message_id)
 
     if decision is None:
@@ -218,29 +169,22 @@ def get_disposition(message_id: str) -> dict:
 
 
 def get_all_dispositions() -> dict:
-    """
-    Return all recorded message dispositions.
-    """
+    """Return all recorded dispositions."""
     return _load_json(DECISIONS_FILE, {})
 
 
 def get_undecided_messages() -> list:
-    """
-    Return messages that currently have no disposition.
-    """
+    """Return message IDs that do not have a disposition yet."""
     decisions = _load_json(DECISIONS_FILE, {})
-    messages = load_inbox()
 
     return [
         message["id"]
-        for message in messages
+        for message in load_inbox()
         if message["id"] not in decisions
     ]
 
 
-# ------------------------------------------------------------------
 # Reversible actions
-# ------------------------------------------------------------------
 
 def apply_reversible_action(
     message_id: str,
@@ -248,76 +192,88 @@ def apply_reversible_action(
     details: dict | None = None,
 ) -> dict:
     """
-    Record/perform a reversible inbox action.
+    Record a reversible action.
 
     Supported actions:
-        draft
-        label
-        archive
-        defer
-        delegate
-
-    No irreversible action is accepted here.
+    draft, label, archive, defer and delegate.
     """
     action = action.lower().strip()
 
     if action not in VALID_REVERSIBLE_ACTIONS:
         return {
             "error": (
-                f"Action '{action}' is not a permitted reversible action."
+                f"Action '{action}' is not supported. "
+                f"Allowed values: {sorted(VALID_REVERSIBLE_ACTIONS)}"
             )
         }
 
-    message = get_message(message_id)
-
-    if message is None:
-        return {
-            "error": f"No message found with ID {message_id}."
-        }
+    if get_message(message_id) is None:
+        return {"error": f"No message found with ID {message_id}."}
 
     state = _load_json(MESSAGE_STATE_FILE, {})
-    message_actions = state.setdefault("actions", [])
+    actions = state.setdefault("actions", [])
 
-    action_record = {
+    record = {
         "message_id": message_id,
         "action": action,
         "details": details or {},
         "timestamp": datetime.now().isoformat(),
     }
 
-    message_actions.append(action_record)
-
+    actions.append(record)
     _save_json(MESSAGE_STATE_FILE, state)
 
     return {
         "status": "completed",
-        **action_record,
+        **record,
     }
 
 
-# ------------------------------------------------------------------
-# Persistent memory tools
-# ------------------------------------------------------------------
+# Irreversible actions
+
+def send(
+    message_id: str,
+    to: str,
+    subject: str,
+    body: str,
+    dry_run: bool = False,
+) -> dict:
+    """Send a message through the safety-gated action."""
+    return send_message(
+        message_id=message_id,
+        to=to,
+        subject=subject,
+        body=body,
+        dry_run=dry_run,
+    )
+
+
+def delete(
+    message_id: str,
+    dry_run: bool = False,
+) -> dict:
+    """Delete a message through the safety-gated action."""
+    return delete_message(
+        message_id=message_id,
+        dry_run=dry_run,
+    )
+
+
+# Persistent memory
 
 def remember(
     key: str,
     value: str,
     source: str = "manual",
 ) -> dict:
-    """
-    Store a persistent preference or fact.
-    """
-    result = memory.remember(key, value, source)
-
+    """Store a persistent preference or fact."""
     return {
-        "message": result,
+        "message": memory.remember(key, value, source)
     }
 
 
 def recall(query: str) -> dict:
-    """
-    Retrieve a persistent preference or fact.
-    """
+    """Retrieve a persistent preference or fact."""
     result = memory.recall(query)
 
     if result:
@@ -333,7 +289,5 @@ def recall(query: str) -> dict:
 
 
 def summarize_memory() -> list:
-    """
-    Return all persistent memory items in readable form.
-    """
+    """Return stored memory in readable form."""
     return memory.summarize_memory()
