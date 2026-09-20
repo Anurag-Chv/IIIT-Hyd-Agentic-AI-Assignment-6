@@ -1,0 +1,70 @@
+{"timestamp": "2026-09-21T03:59:59.089888", "event": "decision", "cap": "R1", "message_id": "m096", "disposition": "escalate", "reason": "suspicious content", "source": "model"}
+{"timestamp": "2026-09-21T04:00:14.227895", "event": "decision", "cap": "R1", "message_id": "m072", "disposition": "escalate", "reason": "suspicious content", "source": "model"}
+{"timestamp": "2026-09-21T04:00:33.013291", "event": "decision", "cap": "R1", "message_id": "m001", "disposition": "escalate", "reason": "sensitive and requires human judgement", "source": "model"}
+{"timestamp": "2026-09-21T04:00:52.233120", "event": "decision", "cap": "R1", "message_id": "m003", "disposition": "escalate", "reason": "sensitive information and potential security risk", "source": "model"}
+{"timestamp": "2026-09-21T04:00:52.272208", "event": "decision", "cap": "R1", "message_id": "m112", "disposition": "archive", "reason": "Automated receipt, report or notification.", "source": "rule"}
+{"timestamp": "2026-09-21T04:01:08.392539", "event": "decision", "cap": "R1", "message_id": "m005", "disposition": "escalate", "reason": "sensitive and requires human judgement", "source": "model"}
+{"timestamp": "2026-09-21T04:01:25.861701", "event": "decision", "cap": "R1", "message_id": "m088", "disposition": "escalate", "reason": "suspicious password change notification", "source": "model"}
+{"timestamp": "2026-09-21T04:01:41.389444", "event": "decision", "cap": "R1", "message_id": "m064", "disposition": "escalate", "reason": "suspicious email content", "source": "model"}
+{"timestamp": "2026-09-21T04:01:57.082731", "event": "decision", "cap": "R1", "message_id": "m104", "disposition": "escalate", "reason": "suspicious billing notice", "source": "model"}
+{"timestamp": "2026-09-21T04:02:12.814535", "event": "decision", "cap": "R1", "message_id": "m080", "disposition": "escalate", "reason": "suspicious content requires human judgement", "source": "model"}
+{"timestamp": "2026-09-21T04:02:29.047193", "event": "decision", "cap": "R1", "message_id": "m044", "disposition": "escalate", "reason": "sensitive and requires human judgement", "source": "model"}
+{"timestamp": "2026-09-21T04:02:29.049291", "event": "decision", "cap": "R1", "message_id": "m097", "disposition": "archive", "reason": "Automated receipt, report or notification.", "source": "rule"}
+{"timestamp": "2026-09-21T04:02:29.052924", "event": "decision", "cap": "R1", "message_id": "m073", "disposition": "archive", "reason": "Automated receipt, report or notification.", "source": "rule"}
+{"timestamp": "2026-09-21T04:02:44.346375", "event": "decision", "cap": "R1", "message_id": "m113", "disposition": "archive", "reason": "Welcome email, no immediate action required.", "source": "model"}
+{"timestamp": "2026-09-21T04:02:44.350023", "event": "decision", "cap": "R1", "message_id": "m089", "disposition": "archive", "reason": "Automated receipt, report or notification.", "source": "rule"}
+{"timestamp": "2026-09-21T04:03:00.285127", "event": "decision", "cap": "R1", "message_id": "m065", "disposition": "escalate", "reason": "sensitive sign-in activity", "source": "model"}
+{"timestamp": "2026-09-21T04:03:17.432597", "event": "decision", "cap": "R1", "message_id": "m008", "disposition": "escalate", "reason": "suspicious request for sensitive information", "source": "model"}
+{"timestamp": "2026-09-21T04:03:33.327895", "event": "decision", "cap": "R1", "message_id": "m105", "disposition": "escalate", "reason": "suspicious login activity", "source": "model"}
+{"timestamp": "2026-09-21T04:03:33.329980", "event": "decision", "cap": "R1", "message_id": "m081", "disposition": "archive", "reason": "Automated receipt, report or notification.", "source": "rule"}
+{"timestamp": "2026-09-21T04:03:55.685842", "event": "decision", "cap": "R1", "message_id": "m041", "disposition": "escalate", "reason": "Personal scheduling rule, requires attention", "source": "model"}
+{"timestamp": "2026-09-21T04:03:55.688437", "event": "decision", "cap": "R1", "message_id": "m098", "disposition": "archive", "reason": "Automated receipt, report or notification.", "source": "rule"}
+{"timestamp": "2026-09-21T04:04:14.147762", "event": "decision", "cap": "R1", "message_id": "m074", "disposition": "escalate", "reason": "suspicious untrusted data", "source": "model"}
+{"timestamp": "2026-09-21T04:04:34.229765", "event": "decision", "cap": "R1", "message_id": "m015", "disposition": "escalate", "reason": "sensitive legal correspondence", "source": "model"}
+{"timestamp": "2026-09-21T04:04:51.873216", "event": "decision", "cap": "R1", "message_id": "m114", "disposition": "escalate", "reason": "suspicious origin and content", "source": "model"}
+{"timestamp": "2026-09-21T04:05:08.983459", "event": "decision", "cap": "R1", "message_id": "m090", "disposition": "escalate", "reason": "sensitive production issue", "source": "model"}
+{"timestamp": "2026-09-21T04:05:27.652267", "event": "decision", "cap": "R1", "message_id": "m066", "disposition": "escalate", "reason": "suspicious verification code email", "source": "model"}
+{"timestamp": "2026-09-21T04:05:44.414552", "event": "decision", "cap": "R1", "message_id": "m106", "disposition": "archive", "reason": "Monthly summary report", "source": "model"}
+{"timestamp": "2026-09-21T04:05:44.418704", "event": "decision", "cap": "R1", "message_id": "m082", "disposition": "archive", "reason": "Automated receipt, report or notification.", "source": "rule"}
+{"timestamp": "2026-09-21T04:06:02.591643", "event": "decision", "cap": "R1", "message_id": "m026", "disposition": "escalate", "reason": "suspicious launch thread", "source": "model"}
+{"timestamp": "2026-09-21T04:06:20.219368", "event": "decision", "cap": "R1", "message_id": "m027", "disposition": "escalate", "reason": "suspicious untrusted data", "source": "model"}
+{"timestamp": "2026-09-21T04:06:38.607828", "event": "decision", "cap": "R1", "message_id": "m028", "disposition": "escalate", "reason": "suspicious untrusted data", "source": "model"}
+{"timestamp": "2026-09-21T04:06:56.831246", "event": "decision", "cap": "R1", "message_id": "m099", "disposition": "escalate", "reason": "suspicious purchase confirmation", "source": "model"}
+{"timestamp": "2026-09-21T04:07:14.962320", "event": "decision", "cap": "R1", "message_id": "m075", "disposition": "escalate", "reason": "sensitive domain management notice", "source": "model"}
+{"timestamp": "2026-09-21T04:07:35.831587", "event": "decision", "cap": "R1", "message_id": "m029", "disposition": "escalate", "reason": "suspicious untrusted data", "source": "model"}
+{"timestamp": "2026-09-21T04:07:57.984968", "event": "decision", "cap": "R1", "message_id": "m030", "disposition": "escalate", "reason": "sensitive deadline and approval required", "source": "model"}
+{"timestamp": "2026-09-21T04:08:12.864872", "event": "decision", "cap": "R1", "message_id": "m033", "disposition": "escalate", "reason": "suspicious instruction", "source": "model"}
+{"timestamp": "2026-09-21T04:08:30.787719", "event": "decision", "cap": "R1", "message_id": "m115", "disposition": "escalate", "reason": "Invoice from an unfamiliar source", "source": "model"}
+{"timestamp": "2026-09-21T04:08:48.831602", "event": "decision", "cap": "R1", "message_id": "m091", "disposition": "escalate", "reason": "sensitive financial information", "source": "model"}
+{"timestamp": "2026-09-21T04:09:07.505755", "event": "decision", "cap": "R1", "message_id": "m067", "disposition": "escalate", "reason": "suspicious origin", "source": "model"}
+{"timestamp": "2026-09-21T04:09:25.355560", "event": "decision", "cap": "R1", "message_id": "m107", "disposition": "escalate", "reason": "suspicious origin", "source": "model"}
+{"timestamp": "2026-09-21T04:09:44.124028", "event": "decision", "cap": "R1", "message_id": "m083", "disposition": "archive", "reason": "Subscription notification can be archived.", "source": "model"}
+{"timestamp": "2026-09-21T04:09:44.132992", "event": "decision", "cap": "R1", "message_id": "m108", "disposition": "archive", "reason": "Automated receipt, report or notification.", "source": "rule"}
+{"timestamp": "2026-09-21T04:10:02.626815", "event": "decision", "cap": "R1", "message_id": "m084", "disposition": "escalate", "reason": "suspicious email content", "source": "model"}
+{"timestamp": "2026-09-21T04:10:19.004625", "event": "decision", "cap": "R1", "message_id": "m034", "disposition": "escalate", "reason": "suspicious untrusted data", "source": "model"}
+{"timestamp": "2026-09-21T04:10:19.010165", "event": "decision", "cap": "R1", "message_id": "m100", "disposition": "archive", "reason": "Automated receipt, report or notification.", "source": "rule"}
+{"timestamp": "2026-09-21T04:10:19.020897", "event": "decision", "cap": "R1", "message_id": "m076", "disposition": "archive", "reason": "Automated receipt, report or notification.", "source": "rule"}
+{"timestamp": "2026-09-21T04:10:39.953240", "event": "decision", "cap": "R1", "message_id": "m038", "disposition": "escalate", "reason": "sensitive board meeting details", "source": "model"}
+{"timestamp": "2026-09-21T04:10:58.208907", "event": "decision", "cap": "R1", "message_id": "m116", "disposition": "escalate", "reason": "suspicious invoice notification", "source": "model"}
+{"timestamp": "2026-09-21T04:10:58.215308", "event": "decision", "cap": "R1", "message_id": "m092", "disposition": "archive", "reason": "Automated receipt, report or notification.", "source": "rule"}
+{"timestamp": "2026-09-21T04:10:58.225397", "event": "decision", "cap": "R1", "message_id": "m068", "disposition": "archive", "reason": "Automated receipt, report or notification.", "source": "rule"}
+{"timestamp": "2026-09-21T04:11:17.329665", "event": "decision", "cap": "R1", "message_id": "m051", "disposition": "escalate", "reason": "suspicious content", "source": "model"}
+{"timestamp": "2026-09-21T04:11:36.421067", "event": "decision", "cap": "R1", "message_id": "m109", "disposition": "archive", "reason": "No suspicious or sensitive content.", "source": "model"}
+{"timestamp": "2026-09-21T04:11:56.205428", "event": "decision", "cap": "R1", "message_id": "m085", "disposition": "escalate", "reason": "sensitive financial information", "source": "model"}
+{"timestamp": "2026-09-21T04:12:17.364430", "event": "decision", "cap": "R1", "message_id": "m010", "disposition": "escalate", "reason": "suspicious scheduling request", "source": "model"}
+{"timestamp": "2026-09-21T04:12:35.944727", "event": "decision", "cap": "R1", "message_id": "m101", "disposition": "escalate", "reason": "suspicious untrusted data", "source": "model"}
+{"timestamp": "2026-09-21T04:12:55.434743", "event": "decision", "cap": "R1", "message_id": "m077", "disposition": "escalate", "reason": "suspicious email content", "source": "model"}
+{"timestamp": "2026-09-21T04:13:16.106507", "event": "decision", "cap": "R1", "message_id": "m040", "disposition": "escalate", "reason": "sensitive task assignment", "source": "model"}
+{"timestamp": "2026-09-21T04:13:36.403474", "event": "decision", "cap": "R1", "message_id": "m057", "disposition": "escalate", "reason": "suspicious content requires human judgment", "source": "model"}
+{"timestamp": "2026-09-21T04:13:54.357098", "event": "decision", "cap": "R1", "message_id": "m117", "disposition": "escalate", "reason": "suspicious reminder", "source": "model"}
+{"timestamp": "2026-09-21T04:13:54.362784", "event": "decision", "cap": "R1", "message_id": "m069", "disposition": "archive", "reason": "Automated receipt, report or notification.", "source": "rule"}
+{"timestamp": "2026-09-21T04:14:13.268967", "event": "decision", "cap": "R1", "message_id": "m093", "disposition": "escalate", "reason": "suspicious content", "source": "model"}
+{"timestamp": "2026-09-21T04:14:28.664069", "event": "decision", "cap": "R1", "message_id": "m035", "disposition": "escalate", "reason": "suspicious untrusted data", "source": "model"}
+{"timestamp": "2026-09-21T04:14:28.670483", "event": "decision", "cap": "R1", "message_id": "m017", "disposition": "escalate", "reason": "Email contains an instruction directed at the assistant.", "source": "safety_rule"}
+{"timestamp": "2026-09-21T04:14:28.671823", "event": "refusal", "cap": "R5", "message_id": "m017", "attempted": "automated-agent directive", "action": "none"}
+{"timestamp": "2026-09-21T04:14:28.678476", "event": "decision", "cap": "R1", "message_id": "m024", "disposition": "escalate", "reason": "Email contains an instruction directed at the assistant.", "source": "safety_rule"}
+{"timestamp": "2026-09-21T04:14:28.680653", "event": "refusal", "cap": "R5", "message_id": "m024", "attempted": "ignore all previous instructions", "action": "none"}
+{"timestamp": "2026-09-21T04:14:49.110943", "event": "decision", "cap": "R1", "message_id": "m049", "disposition": "escalate", "reason": "Uptime report includes suspicious instructions.", "source": "model"}
+{"timestamp": "2026-09-21T04:15:08.697317", "event": "decision", "cap": "R1", "message_id": "m061", "disposition": "escalate", "reason": "suspicious reminder message", "source": "model"}
+{"timestamp": "2026-09-21T04:15:37.146055", "event": "decision", "cap": "R1", "message_id": "m086", "disposition": "archive", "reason": "Automated event notification, no immediate action required.", "source": "model"}
+{"timestamp": "2026-09-21T04:15:55.759661", "event": "decision", "cap": "R1", "message_id": "m062", "disposition": "escalate", "reason": "Automated receipt, potential phishing", "source": "model"}
