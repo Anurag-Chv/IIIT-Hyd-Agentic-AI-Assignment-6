@@ -1,28 +1,48 @@
 """
-GateBot exploration script for SkyVault Agent.
-Demonstrates calling a tool (find_available_gate) through MCPClient
-without importing agent.py or tools.py directly.
+InboxBot exploration script for InboxHero.
+
+Demonstrates that InboxHero tools can be called through the MCP
+client without importing agent.py directly.
 """
 
 import sys
 from pathlib import Path
 
-# Add Common/ folder to path
-sys.path.insert(0, str(Path(__file__).resolve().parent / "Common"))
+# Add project root and Common/ to the Python path
+ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "Common"))
 
 from mcp_server import MCPServer, ToolRegistry
 from mcp_client import MCPClient
 
 
 def main():
-    # Set up MCP layer
+    """
+    Run a small MCP smoke test for InboxHero tools.
+    """
+
     registry = ToolRegistry()
     server = MCPServer(registry)
     client = MCPClient(server)
 
-    # Call a tool directly through MCPClient
-    result = client.call_tool("find_available_gate", {"terminal": "T2"})
-    print("GateBot result:", result)
+    print("=== InboxBot MCP Demo ===")
+
+    # Test inbox search
+    result = client.call_tool(
+        "search_messages",
+        {"query": "board review"},
+    )
+    print("\nSearch result:")
+    print(result)
+
+    # Test thread retrieval
+    result = client.call_tool(
+        "get_thread",
+        {"thread_id": "t-launch"},
+    )
+    print("\nThread result:")
+    print(result)
 
 
 if __name__ == "__main__":
