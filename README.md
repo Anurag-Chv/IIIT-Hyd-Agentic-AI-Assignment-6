@@ -1,57 +1,126 @@
-### Updated `README.md`
+Your current `README.md` is still referring to a few things we removed or changed:
+
+- `Common/schemas.py` → deleted
+- `main.py --chat` → removed
+- `agent.py` is now provider-independent with MCP
+- `mcp_server.py` is the runtime tool catalog
+- the actual GitHub repository URL is known
+- R1–R6 and custom capabilities should remain documented as work in progress until we have real evidence
+
+I recommend replacing it with this cleaner version.
 
 ```markdown
 # InboxHero – IIIT Hyderabad Agentic AI Assignment 6
 
+**GitHub Repository:**  
+https://github.com/Anurag-Chv/IIIT-Hyd-Agentic-AI-Assignment-6
+
 ## Overview
 
-InboxHero is an agentic email assistant built for Assignment 6 of the
-IIIT Hyderabad Agentic AI course.
+InboxHero is an agentic email assistant built for Assignment 6 of the IIIT Hyderabad Agentic AI course.
 
-The goal is to process a complete inbox, decide what should happen to
-each message, perform safe actions automatically, and stop when an
-action needs human approval.
+The goal is to process a complete local inbox, decide what should happen to every message, perform allowed actions, and stop safely when human approval is required.
 
-The system is being built as a custom Python application. During
-development, I am using Ollama with Qwen2.5:7B as the local model.
+The project uses a custom Python agent architecture with MCP-style tool discovery and execution.
 
----
+During development, the primary local model is Ollama with `qwen2.5:7b`.
 
 ## Project Structure
 
-- `main.py` – simple demo and interactive chat entry point.
-- `agent.py` – main agent flow.
-- `planner.py` – creates a goal and plan before execution.
-- `reflector.py` – reviews the completed process.
-- `config.py` – loads model and application configuration.
-- `memory.py` – persistent memory for user preferences.
-- `memory_store.json` – local persistent memory store.
-- `mcp_server.py` – MCP server and tool registry.
-- `mcp_client.py` – MCP client.
-- `gatebot.py` – small MCP/tool exploration script.
-- `app.py` – tests and development demos.
-- `Common/data.py` – inbox data access functions.
-- `Common/tools.py` – InboxHero tool implementations.
-- `Common/schemas.py` – tool definitions.
-- `Common/llm.py` – LLM wrapper for Ollama/Gemini.
-- `inbox.json` – supplied mock inbox.
-- `.env.example` – environment variable template.
-- `requirements.txt` – Python dependencies.
+- `main.py` – development entry point for inbox processing
+- `agent.py` – planner, LLM, MCP tools and reflection flow
+- `planner.py` – creates the Goal and Plan
+- `reflector.py` – reviews the completed agent process
+- `workflow.py` – main inbox processing logic
+- `rules.py` – handles obvious automated messages before the model
+- `safety.py` – approval gate for irreversible actions
+- `actions.py` – send/delete implementations
+- `trace.py` – JSONL audit log
+- `dashboard.py` – generates the three-pane dashboard
+- `memory.py` – persistent memory
+- `memory_store.json` – local memory store
+- `mcp_server.py` – MCP server and runtime tool registry
+- `mcp_client.py` – MCP client
+- `gatebot.py` – MCP smoke test
+- `app.py` – unit and integration tests
+- `Common/data.py` – inbox data access
+- `Common/tools.py` – tool implementations
+- `Common/llm.py` – LLM provider wrapper
+- `inbox.json` – supplied mock inbox
+- `outbox/` – simulated sent messages
+- `decisions.json` – message dispositions
+- `message_state.json` – reversible action state
+- `.env.example` – environment configuration template
+- `requirements.txt` – Python dependencies
 
----
+## Architecture
+
+The project uses a custom Python agent architecture rather than a third-party agent framework.
+
+The main flow is:
+
+```text
+User Request
+    ↓
+Planner
+    ↓
+Agent / LLM
+    ↓
+MCP Client
+    ↓
+MCP Server
+    ↓
+Tool Registry
+    ↓
+Tool Result
+    ↓
+LLM
+    ↓
+Final Result
+    ↓
+Reflector
+```
+
+Inbox processing in `workflow.py` uses a separate path:
+
+```text
+Inbox Message
+    ↓
+Hostile Instruction Check
+    ↓
+Phishing Check
+    ↓
+Rule-Based Classification
+    ↓
+LLM Classification when needed
+    ↓
+Disposition + Reason
+    ↓
+Reversible Action / Human Review
+    ↓
+Trace
+```
+
+Email content is treated as untrusted data throughout the system.
 
 ## Model
 
-The primary development setup is:
+Current development setup:
 
-- Provider: Ollama
-- Model: `qwen2.5:7b`
-- Ollama URL: `http://localhost:11434`
+```text
+LLM_PROVIDER=ollama
+MODEL_NAME=qwen2.5:7b
+OLLAMA_BASE_URL=http://localhost:11434
+```
 
-The model provider is configured through environment variables in
-`config.py`.
+The provider is configured through `config.py`.
 
----
+For local development:
+
+```bash
+ollama list
+ollama run qwen2.5:7b
+```
 
 ## Setup
 
@@ -64,66 +133,49 @@ pip install -r requirements.txt
 copy .env.example .env
 ```
 
-Update `.env` with the required settings.
+Set the required values in `.env`.
 
-For local Ollama development:
-
-```text
-LLM_PROVIDER=ollama
-MODEL_NAME=qwen2.5:7b
-OLLAMA_BASE_URL=http://localhost:11434
-```
-
-Make sure Ollama is running and the model is available:
-
-```bash
-ollama list
-ollama run qwen2.5:7b
-```
-
-`.env` is local only and is not committed to GitHub.
-
----
+The `.env` file is local only and is not committed to GitHub.
 
 ## Run
 
-### Basic demo
+### Inbox processing
 
 ```bash
 python main.py
 ```
 
-### Interactive mode
-
-```bash
-python main.py --chat
-```
-
-### Run tests
+### Tests
 
 ```bash
 python app.py -v
 ```
 
-### MCP exploration
+### MCP smoke test
+
+```bash
+python mcp_client.py
+```
+
+or:
 
 ```bash
 python gatebot.py
 ```
 
-The graded capability interface will be provided through:
+### Graded capability interface
+
+The final assignment interface is:
 
 ```bash
 python demo.py --cap R1
 ```
 
-and the corresponding commands for the remaining capabilities.
-
----
+The same interface will be used for R2-R6 and the custom capabilities.
 
 ## Inbox
 
-The supplied `inbox.json` contains 100 email messages.
+The supplied `inbox.json` contains 100 messages.
 
 Each message contains:
 
@@ -136,142 +188,183 @@ Each message contains:
 - `body`
 - `unread`
 
-The inbox contains normal work messages, newsletters and receipts,
-messages requiring earlier thread context, standing preferences,
-commitments, phishing/social-engineering attempts and messages
-containing instructions aimed at the assistant.
+The inbox includes normal work messages, automated notifications, messages requiring earlier-thread context, standing preferences, commitments, phishing and social-engineering attempts, and messages containing instructions aimed at the assistant.
 
----
+## Safety Design
 
-## Design Approach
+InboxHero treats all email content as untrusted data.
 
-InboxHero separates simple rule-based work from model-based work.
+Instructions inside an email are not treated as system instructions and cannot directly control the agent.
 
-Obvious messages such as receipts, newsletters and automated
-notifications should be handled by rules whenever possible. Messages
-that need reasoning, retrieval or drafting can be passed to the model.
+Examples include requests to:
 
-For retrieval, the current design uses thread-based retrieval first,
-with keyword search available when information needs to be found
-across threads.
+- forward mailbox contents
+- expose credentials or secrets
+- bypass approval
+- change configuration
+- delete messages
+- hide actions from the user
 
-Email content is treated as untrusted data. Instructions found inside
-messages are not treated as system instructions.
+Irreversible actions are limited to:
 
-Irreversible actions such as sending or deleting messages will be
-protected by a separate safety gate.
+```text
+send
+delete
+```
 
----
+Both actions are reachable only through the application safety gate.
 
-## Required Assignment Capabilities
+The gate supports:
 
-The assignment requires six capabilities:
+- explicit human approval
+- dry-run mode
+- logging of the proposal
+- logging of the human decision
+- logging of the outcome
 
-- `R1` – Zero the inbox
-- `R2` – Grounded reply
-- `R3` – Gate the irreversible
-- `R4` – Persistent preference
-- `R5` – Refuse embedded instructions
-- `R6` – Dashboard
+Sending a message writes one JSON file to `outbox/`.
 
-The final capability definitions, commands and observable evidence are
-documented in `CAPABILITIES.md` and `capabilities.json`.
+## Retrieval
 
----
+The primary retrieval method for grounded replies is thread-based retrieval.
 
-## Custom Capabilities
+For a target message, InboxHero retrieves earlier messages from the same thread and uses only those messages as grounding context.
 
-In addition to R1-R6, the project will include several additional
-capabilities selected for the InboxHero use case.
+Keyword search is also available for cross-thread retrieval.
 
-These will be documented after implementation and testing.
-
----
-
-## Safety
-
-InboxHero does not treat email content as trusted instructions.
-
-For example, an email may contain a request to forward the mailbox,
-delete a message or bypass an approval step. Such instructions are
-treated as part of the email content and are not executed.
-
-Irreversible actions require the safety gate defined by the final
-design.
-
-The system also records decisions and important actions so that a
-completed run can be inspected later.
-
----
+Grounded replies record the message IDs actually used to produce the draft.
 
 ## Persistent Memory
 
-InboxHero uses a small JSON file for information that must survive a
-process restart.
+InboxHero stores persistent preferences in `memory_store.json`.
 
-Example preferences can include:
+The stored information survives process exit and restart.
+
+Example:
 
 ```text
-Do not schedule meetings before 11:00 AM.
-CC Priya on legal correspondence.
+meeting_start = 11:00
 ```
 
-The preference is stored on disk and can be used during a later run.
+A preference from the inbox can therefore affect later processing.
 
----
+## Required Assignment Capabilities
 
-## GitHub
+The project implements the following required capabilities:
 
-Repository:
+| ID | Capability |
+|---|---|
+| R1 | Zero the inbox |
+| R2 | Grounded reply |
+| R3 | Gate the irreversible |
+| R4 | Persistent preference |
+| R5 | Refuse embedded instructions |
+| R6 | Dashboard |
 
-`https://github.com/<your-github-username>/IIIT-Hyd-Agentic-AI-Assignment-6`
+Final commands, evidence and capability details are documented in:
 
-The repository contains the development history for the assignment.
+```text
+CAPABILITIES.md
+capabilities.json
+```
 
----
+## Custom Capabilities
+
+The project will include 3–5 additional capabilities beyond R1-R6.
+
+The final capabilities will be documented in:
+
+```text
+CAPABILITIES.md
+capabilities.json
+```
+
+They will include their own commands and observable output.
+
+## Dashboard
+
+The InboxHero dashboard contains exactly three panes:
+
+1. Pending Actions
+2. Flagged
+3. Commitments
+
+Commitments include their supporting message IDs.
+
+The dashboard also surfaces conflicts between commitments with the same date and time.
+
+The generated files are:
+
+```text
+dashboard.html
+dashboard.json
+```
+
+## Traceability
+
+Important decisions and actions are recorded in:
+
+```text
+trace.jsonl
+```
+
+The trace records events such as:
+
+- decisions
+- message reads
+- refusals
+- flagged messages
+- drafts
+- safety-gate decisions
+- irreversible actions
+- run summaries
+- commitment extraction
+
+This provides evidence for reproducing and reviewing a completed run.
+
+## Final Report
+
+### 1. What did InboxHero refuse to automate, and why?
+
+To be completed after the final implementation and demonstration run.
+
+### 2. Where does untrusted text enter, and what would an attacker have to defeat?
+
+To be completed after the final implementation and demonstration run.
+
+### 3. Who is accountable for a wrong send, and how is it traceable?
+
+To be completed after the final implementation and demonstration run.
+
+### 4. How does the project map to Agents, Tasks, Crew or a router?
+
+To be completed after the final architecture is finalized.
+
+## Development History
+
+The project is developed incrementally.
+
+Major changes are committed and pushed to GitHub throughout development so the repository contains the implementation history.
 
 ## Final Submission
 
-The final ZIP will contain:
+The final submission will contain:
 
-- complete runnable Python project
-- `demo.py`
-- `CAPABILITIES.md`
-- `capabilities.json`
-- `README.md`
-- `inbox.json`
-- `outbox/`
-- `trace.jsonl`
-- `.env.example`
+```text
+demo.py
+CAPABILITIES.md
+capabilities.json
+README.md
+inbox.json
+outbox/
+trace.jsonl
+.env.example
+```
 
 It will not contain:
 
-- `.env`
-- virtual environments
-- `__pycache__/`
-- other local-only files
-
-The final submission filename will be:
-
 ```text
-inboxHero_YourName.zip
+.env
+venviiit/
+__pycache__/
 ```
-
----
-
-## Development Notes
-
-This project is being developed incrementally. Each major change is
-committed and pushed to GitHub so the repository keeps a clear history
-of the implementation.
-```
-
-### Why I'm keeping this version deliberately simple
-
-I've removed the old Assignment 5 reflection answers and claims such as:
-
-> "23 tests OK"
-
-because those are no longer true for Assignment 6. We shouldn't put results into the README until we've actually run them.
-
-I also haven't invented our **3–5 custom capabilities** yet. We'll choose those after R1–R6 are clear.
