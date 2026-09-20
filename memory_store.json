@@ -1,0 +1,12 @@
+{
+  "work_location": {
+    "value": "Terminal 2",
+    "source": "manual",
+    "timestamp": "2026-09-01T23:36:03.748483"
+  },
+  "preferred_terminal": {
+    "value": "T2",
+    "source": "test",
+    "timestamp": "2026-09-01T23:58:20.828871"
+  }
+}
