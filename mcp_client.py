@@ -1,64 +1,71 @@
 """
-MCP Client for SkyVault Agent.
-Implements JSON-RPC style requests to the MCPServer:
-- initialize
-- tools/list
-- tools/call
-
-The client sends correctly-shaped dictionaries and returns parsed results.
+MCP client for InboxHero.
+Sends initialize, tools/list and tools/call requests to the MCP server.
 """
 
 import uuid
+
 from mcp_server import MCPServer, ToolRegistry
 
 
 class MCPClient:
-    """
-    MCPClient communicates with MCPServer using JSON-RPC messages.
-    """
+    """Simple client for communicating with the MCP server."""
 
     def __init__(self, server: MCPServer):
         self.server = server
         self.protocol_version = "2.0"
-        self.client_name = "SkyVault MCPClient"
+        self.client_name = "InboxHero MCPClient"
 
-        # Perform handshake at startup
-        init_req = {
+        # Initialize the connection
+        request = {
             "jsonrpc": self.protocol_version,
             "id": str(uuid.uuid4()),
             "method": "initialize",
             "params": {"client_name": self.client_name},
         }
-        self.init_response = self.server.handle(init_req)
+
+        self.init_response = self.server.handle(request)
 
     def list_tools(self):
-        """Request the list of tools from the server."""
-        req = {
+        """Get the tools exposed by the server."""
+        request = {
             "jsonrpc": self.protocol_version,
             "id": str(uuid.uuid4()),
             "method": "tools/list",
             "params": {},
         }
-        resp = self.server.handle(req)
-        if "error" in resp:
-            raise RuntimeError(f"Error listing tools: {resp['error']}")
-        return resp["result"]
+
+        response = self.server.handle(request)
+
+        if "error" in response:
+            raise RuntimeError(
+                f"Error listing tools: {response['error']}"
+            )
+
+        return response["result"]
 
     def call_tool(self, name: str, arguments: dict):
-        """Call a tool by name with arguments."""
-        req = {
+        """Call a tool through the MCP server."""
+        request = {
             "jsonrpc": self.protocol_version,
             "id": str(uuid.uuid4()),
             "method": "tools/call",
-            "params": {"fname": name, "arguments": arguments},
+            "params": {
+                "fname": name,
+                "arguments": arguments,
+            },
         }
-        resp = self.server.handle(req)
-        if "error" in resp:
-            raise RuntimeError(f"Error calling tool {name}: {resp['error']}")
-        return resp["result"]
+
+        response = self.server.handle(request)
+
+        if "error" in response:
+            raise RuntimeError(
+                f"Error calling tool {name}: {response['error']}"
+            )
+
+        return response["result"]
 
 
-# Demo run (only executes if mcp_client.py is run directly)
 if __name__ == "__main__":
     registry = ToolRegistry()
     server = MCPServer(registry)
@@ -67,16 +74,17 @@ if __name__ == "__main__":
     print("=== Initialize ===")
     print(client.init_response)
 
-    print("\n=== Tools List ===")
-    tools = client.list_tools()
-    for t in tools:
-        print(t)
+    print("\n=== Tools ===")
+    for tool in client.list_tools():
+        print(tool["name"])
 
-    print("\n=== Call Tool (find_available_gate) ===")
-    result = client.call_tool("find_available_gate", {"terminal": "T2"})
+    print("\n=== Inbox Summary ===")
+    result = client.call_tool("get_inbox_summary", {})
     print(result)
 
-    print("\n=== Call Tool (remember + recall) ===")
-    client.call_tool("remember", {"key": "preferred_terminal", "value": "T2", "source": "demo"})
-    recall_result = client.call_tool("recall", {"query": "preferred_terminal"})
-    print(recall_result)
+    print("\n=== Search ===")
+    result = client.call_tool(
+        "search_messages",
+        {"query": "board review"},
+    )
+    print(result)
