@@ -1,90 +1,231 @@
 """
-MCP Server for SkyVault Agent (Assignment 5).
-Implements JSON-RPC style message lifecycle by hand:
+MCP Server for InboxHero.
+
+Implements the hand-built JSON-RPC style protocol used in Assignment 5:
 - initialize
 - tools/list
 - tools/call
 
-Wraps all tools (including memory) behind a protocol boundary.
+All InboxHero tools are exposed behind the MCP protocol boundary.
 """
 
+import sys
 import uuid
+from pathlib import Path
+
+# Ensure project root and Common/ are available
+ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "Common"))
+
 from tools import (
-    find_available_gate,
-    get_flight_status,
-    get_weather,
-    lookup_aircraft,
-    maintenance_history,
-    search_passenger,
+    list_messages,
+    get_message_by_id,
+    get_email_thread,
+    search_inbox,
+    list_unread_messages,
+    get_inbox_summary,
+    record_disposition,
+    get_disposition,
+    get_all_dispositions,
+    get_undecided_messages,
+    apply_reversible_action,
     remember,
     recall,
+    summarize_memory,
 )
 
 
 class ToolRegistry:
     """
-    Registry of all available tools.
-    Each tool is described with name, description, parameters, and required fields.
+    Registry of InboxHero tools.
+
+    Each entry contains:
+    - function
+    - description
+    - parameters
+    - required parameters
     """
 
     def __init__(self):
         self.tools = {
-            "get_flight_status": {
-                "func": get_flight_status,
-                "description": "Retrieve the current status of a flight.",
-                "params": {"flight_number": {"type": "STRING"}},
-                "required": ["flight_number"],
+            "list_messages": {
+                "func": list_messages,
+                "description": "Return all messages in the inbox.",
+                "params": {},
+                "required": [],
             },
-            "search_passenger": {
-                "func": search_passenger,
-                "description": "Look up a passenger's booking details.",
-                "params": {"name": {"type": "STRING"}},
-                "required": ["name"],
+            "get_message": {
+                "func": get_message_by_id,
+                "description": "Retrieve a specific email by message ID.",
+                "params": {
+                    "message_id": {
+                        "type": "string",
+                        "description": "Message ID, for example m003.",
+                    }
+                },
+                "required": ["message_id"],
             },
-            "maintenance_history": {
-                "func": maintenance_history,
-                "description": "Get maintenance and inspection records for an aircraft.",
-                "params": {"tail_number": {"type": "STRING"}},
-                "required": ["tail_number"],
+            "get_thread": {
+                "func": get_email_thread,
+                "description": (
+                    "Retrieve all messages belonging to an email thread "
+                    "in timestamp order."
+                ),
+                "params": {
+                    "thread_id": {
+                        "type": "string",
+                        "description": "Thread ID, for example t-launch.",
+                    }
+                },
+                "required": ["thread_id"],
             },
-            "find_available_gate": {
-                "func": find_available_gate,
-                "description": "Find an available boarding gate at a terminal.",
-                "params": {"terminal": {"type": "STRING"}},
-                "required": ["terminal"],
+            "search_messages": {
+                "func": search_inbox,
+                "description": (
+                    "Search sender, recipient, subject and body text "
+                    "across the inbox."
+                ),
+                "params": {
+                    "query": {
+                        "type": "string",
+                        "description": "Text to search for.",
+                    }
+                },
+                "required": ["query"],
             },
-            "get_weather": {
-                "func": get_weather,
-                "description": "Get current weather conditions at an airport.",
-                "params": {"airport": {"type": "STRING"}},
-                "required": ["airport"],
+            "get_unread_messages": {
+                "func": list_unread_messages,
+                "description": "Return all unread messages.",
+                "params": {},
+                "required": [],
             },
-            "lookup_aircraft": {
-                "func": lookup_aircraft,
-                "description": "Look up technical specifications for an aircraft type.",
-                "params": {"aircraft_type": {"type": "STRING"}},
-                "required": ["aircraft_type"],
+            "get_inbox_summary": {
+                "func": get_inbox_summary,
+                "description": "Return basic inbox statistics.",
+                "params": {},
+                "required": [],
+            },
+            "record_disposition": {
+                "func": record_disposition,
+                "description": (
+                    "Assign exactly one disposition and reason to a message."
+                ),
+                "params": {
+                    "message_id": {
+                        "type": "string",
+                        "description": "Message ID.",
+                    },
+                    "disposition": {
+                        "type": "string",
+                        "description": (
+                            "One of reply, archive, defer, "
+                            "delegate or escalate."
+                        ),
+                    },
+                    "reason": {
+                        "type": "string",
+                        "description": "One-line reason for the disposition.",
+                    },
+                },
+                "required": ["message_id", "disposition", "reason"],
+            },
+            "get_disposition": {
+                "func": get_disposition,
+                "description": "Return the current disposition of a message.",
+                "params": {
+                    "message_id": {
+                        "type": "string",
+                        "description": "Message ID.",
+                    }
+                },
+                "required": ["message_id"],
+            },
+            "get_all_dispositions": {
+                "func": get_all_dispositions,
+                "description": "Return all recorded message dispositions.",
+                "params": {},
+                "required": [],
+            },
+            "get_undecided_messages": {
+                "func": get_undecided_messages,
+                "description": (
+                    "Return messages that do not yet have a disposition."
+                ),
+                "params": {},
+                "required": [],
+            },
+            "apply_reversible_action": {
+                "func": apply_reversible_action,
+                "description": (
+                    "Perform a reversible inbox action such as draft, "
+                    "label, archive, defer or delegate."
+                ),
+                "params": {
+                    "message_id": {
+                        "type": "string",
+                        "description": "Message ID.",
+                    },
+                    "action": {
+                        "type": "string",
+                        "description": (
+                            "Reversible action: draft, label, archive, "
+                            "defer or delegate."
+                        ),
+                    },
+                    "details": {
+                        "type": "object",
+                        "description": "Optional action details.",
+                    },
+                },
+                "required": ["message_id", "action"],
             },
             "remember": {
                 "func": remember,
-                "description": "Store a fact persistently in memory_store.json.",
+                "description": (
+                    "Store a user preference or fact persistently."
+                ),
                 "params": {
-                    "key": {"type": "STRING"},
-                    "value": {"type": "STRING"},
-                    "source": {"type": "STRING"},
+                    "key": {
+                        "type": "string",
+                        "description": "Memory key.",
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "Preference or fact to remember.",
+                    },
+                    "source": {
+                        "type": "string",
+                        "description": "Source of the information.",
+                    },
                 },
                 "required": ["key", "value"],
             },
             "recall": {
                 "func": recall,
-                "description": "Retrieve a fact from persistent memory_store.json.",
-                "params": {"query": {"type": "STRING"}},
+                "description": (
+                    "Retrieve a previously stored preference or fact."
+                ),
+                "params": {
+                    "query": {
+                        "type": "string",
+                        "description": "Memory key to retrieve.",
+                    }
+                },
                 "required": ["query"],
+            },
+            "summarize_memory": {
+                "func": summarize_memory,
+                "description": "Return all stored persistent memories.",
+                "params": {},
+                "required": [],
             },
         }
 
     def list_tools(self):
-        """Return metadata for all tools."""
+        """
+        Return tool metadata without exposing Python function objects.
+        """
         return [
             {
                 "name": name,
@@ -96,37 +237,87 @@ class ToolRegistry:
         ]
 
     def call_tool(self, name, arguments):
-        """Execute a tool by name with given arguments."""
+        """
+        Execute a registered tool after validating its name and arguments.
+        """
         if name not in self.tools:
             raise ValueError(f"Unknown tool: {name}")
-        func = self.tools[name]["func"]
-        return func(**arguments)
+
+        if not isinstance(arguments, dict):
+            raise ValueError("Tool arguments must be a dictionary.")
+
+        meta = self.tools[name]
+
+        missing = [
+            field
+            for field in meta["required"]
+            if field not in arguments
+        ]
+
+        if missing:
+            raise ValueError(
+                f"Missing required argument(s) for {name}: {missing}"
+            )
+
+        return meta["func"](**arguments)
 
 
 class MCPServer:
     """
-    MCPServer handles JSON-RPC requests and returns responses.
+    Handle JSON-RPC style MCP requests.
     """
 
     def __init__(self, registry: ToolRegistry):
         self.registry = registry
         self.protocol_version = "2.0"
-        self.server_name = "SkyVault MCPServer"
+        self.server_name = "InboxHero MCPServer"
 
     def _make_response(self, req_id, result=None, error=None):
-        resp = {"jsonrpc": self.protocol_version, "id": req_id}
-        if error:
-            resp["error"] = error
+        """
+        Construct a JSON-RPC response.
+        """
+        response = {
+            "jsonrpc": self.protocol_version,
+            "id": req_id,
+        }
+
+        if error is not None:
+            response["error"] = error
         else:
-            resp["result"] = result
-        return resp
+            response["result"] = result
+
+        return response
 
     def handle(self, request: dict) -> dict:
-        """Process a JSON-RPC request and return a response."""
+        """
+        Process one JSON-RPC request.
+        """
         try:
+            if not isinstance(request, dict):
+                return self._make_response(
+                    None,
+                    error={
+                        "code": -32600,
+                        "message": "Request must be a JSON object.",
+                    },
+                )
+
             method = request.get("method")
             req_id = request.get("id", str(uuid.uuid4()))
             params = request.get("params", {})
+
+            if not isinstance(params, dict):
+                return self._make_response(
+                    req_id,
+                    error={
+                        "code": -32602,
+                        "message": "Request params must be an object.",
+                    },
+                )
+
+            # ------------------------------------------------------
+            # Initialize
+            # ------------------------------------------------------
 
             if method == "initialize":
                 return self._make_response(
@@ -137,52 +328,110 @@ class MCPServer:
                     },
                 )
 
-            elif method == "tools/list":
-                return self._make_response(req_id, result=self.registry.list_tools())
+            # ------------------------------------------------------
+            # List tools
+            # ------------------------------------------------------
 
-            elif method == "tools/call":
-                fname = params.get("fname")
-                arguments = params.get("arguments", {})
-                try:
-                    result = self.registry.call_tool(fname, arguments)
-                    return self._make_response(req_id, result=result)
-                except Exception as e:
-                    return self._make_response(
-                        req_id,
-                        error={"code": -32001, "message": str(e)},
-                    )
-
-            else:
+            if method == "tools/list":
                 return self._make_response(
                     req_id,
-                    error={"code": -32601, "message": f"Unknown method: {method}"},
+                    result=self.registry.list_tools(),
                 )
 
-        except Exception as e:
+            # ------------------------------------------------------
+            # Call tool
+            # ------------------------------------------------------
+
+            if method == "tools/call":
+                tool_name = params.get("fname")
+                arguments = params.get("arguments", {})
+
+                if not tool_name:
+                    return self._make_response(
+                        req_id,
+                        error={
+                            "code": -32602,
+                            "message": "Missing tool name.",
+                        },
+                    )
+
+                try:
+                    result = self.registry.call_tool(
+                        tool_name,
+                        arguments,
+                    )
+
+                    return self._make_response(
+                        req_id,
+                        result=result,
+                    )
+
+                except Exception as exc:
+                    return self._make_response(
+                        req_id,
+                        error={
+                            "code": -32001,
+                            "message": str(exc),
+                        },
+                    )
+
+            # ------------------------------------------------------
+            # Unknown method
+            # ------------------------------------------------------
+
             return self._make_response(
-                request.get("id", None),
-                error={"code": -32000, "message": f"Server error: {str(e)}"},
+                req_id,
+                error={
+                    "code": -32601,
+                    "message": f"Unknown method: {method}",
+                },
+            )
+
+        except Exception as exc:
+            return self._make_response(
+                request.get("id") if isinstance(request, dict) else None,
+                error={
+                    "code": -32000,
+                    "message": f"Server error: {exc}",
+                },
             )
 
 
-# Demo run (only executes if mcp_server.py is run directly)
 if __name__ == "__main__":
     registry = ToolRegistry()
     server = MCPServer(registry)
 
-    # Example initialize
-    init_req = {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}
-    print(server.handle(init_req))
+    print("=== InboxHero MCP Server Demo ===")
 
-    # Example tools/list
-    list_req = {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}}
-    print(server.handle(list_req))
+    init_request = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "initialize",
+        "params": {},
+    }
 
-    # Example tools/call
-    call_req = {
+    print("\nInitialize:")
+    print(server.handle(init_request))
+
+    list_request = {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "method": "tools/list",
+        "params": {},
+    }
+
+    print("\nTools:")
+    print(server.handle(list_request))
+
+    call_request = {
         "jsonrpc": "2.0",
         "id": 3,
         "method": "tools/call",
-        "params": {"fname": "find_available_gate", "arguments": {"terminal": "T2"}},
+        "params": {
+            "fname": "get_inbox_summary",
+            "arguments": {},
+        },
     }
-    print(server.handle(call_req))
+
+    print("\nTool call:")
+    print(server.handle(call_request))
