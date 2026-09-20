@@ -1,76 +1,77 @@
 """
-Planner module for SkyVault Agent.
-Prepares a clear Goal and step-by-step Plan
-before any tool execution begins, so the agent’s intent is visible.
+Planner module for InboxHero.
 
-⚠️ Note: In Assignment 5, tool declarations are now fetched dynamically
-via MCPClient.list_tools(). This file remains as a static reference only.
+Creates a visible Goal and step-by-step Plan before the main
+inbox-processing workflow begins.
 """
 
 import sys
 from pathlib import Path
 
-# Add Common/ folder to Python path for imports
+# Add Common/ folder to Python path
 sys.path.insert(0, str(Path(__file__).resolve().parent / "Common"))
 
 from llm import chat
-from schemas import skyvault_tool_declarations
 
 
-def _tools_summary():
-    """
-    Create a short overview of all available tools
-    with their required parameters and descriptions.
-    """
-    lines = []
-    for declaration in skyvault_tool_declarations:
-        required = declaration.parameters.required or []
-        params = ", ".join(required)
-        lines.append(f"- {declaration.name}({params}): {declaration.description}")
-    return "\n".join(lines)
+PLANNER_SYSTEM = """
+You are the planning component of InboxHero.
 
+InboxHero processes an email inbox safely and decides what should happen
+to each message.
 
-# System prompt for Gemini planning
-PLANNER_SYSTEM = f"""You are assisting with SkyVault planning.
-Before running any tools, outline a one-sentence Goal and a numbered Plan.
-Use only the tools listed below when needed.
-If the query can be answered directly, note that no tools are required.
+Before execution, produce:
+1. One concise Goal.
+2. A numbered Plan describing the major steps needed.
 
-Available tools (static reference):
-{_tools_summary()}
+The plan should consider:
+- identifying obvious rule-based messages first,
+- using the model only where reasoning is required,
+- retrieving earlier messages when context is needed,
+- identifying actions that require human approval,
+- detecting suspicious or hostile instructions,
+- recording decisions and evidence,
+- producing the required final results.
 
-Format your response exactly like this:
+Do not execute any action.
+Do not invent information about messages that has not been provided.
+
+Format the response exactly as:
+
 Goal:
-<short statement of what needs to be figured out>
+<short statement>
 
 Plan:
-1. <first step, tool if applicable>
-2. <next step>
-3. <continue until complete>
-"""
+1. <first step>
+2. <second step>
+3. <third step>
+...
+""".strip()
 
 
 def create_plan(user_question: str) -> str:
     """
-    Ask the Gemini model to generate a Goal and Plan
-    for the given user question.
+    Ask the configured LLM to generate a Goal and Plan.
     """
-    prompt = f"User query: {user_question}\n\nPlease provide a Goal and Plan."
+    prompt = (
+        f"User request:\n{user_question}\n\n"
+        "Create the Goal and Plan for this request."
+    )
+
     return chat(prompt, system=PLANNER_SYSTEM)
 
 
 def display_plan(plan_text: str) -> None:
     """
-    Print the Goal and Plan in a readable format
-    before tool execution starts.
+    Display the generated plan before execution begins.
     """
     print("\n--- Planning Stage ---")
     print(plan_text.strip())
     print("----------------------\n")
 
 
-# Demo run (only executes if planner.py is run directly)
 if __name__ == "__main__":
-    sample_question = "What is the status of flight AI101?"
+    sample_question = "Process the inbox and identify what needs my attention."
+
     plan = create_plan(sample_question)
     display_plan(plan)
