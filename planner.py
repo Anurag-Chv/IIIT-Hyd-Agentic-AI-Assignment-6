@@ -1,42 +1,25 @@
-"""
-Planner module for InboxHero.
-
-Creates a visible Goal and step-by-step Plan before the main
-inbox-processing workflow begins.
-"""
-
-import sys
-from pathlib import Path
-
-# Add Common/ folder to Python path
-sys.path.insert(0, str(Path(__file__).resolve().parent / "Common"))
-
-from llm import chat
+from Common.llm import chat
 
 
 PLANNER_SYSTEM = """
 You are the planning component of InboxHero.
 
-InboxHero processes an email inbox safely and decides what should happen
-to each message.
-
-Before execution, produce:
+Before processing the inbox, produce:
 1. One concise Goal.
-2. A numbered Plan describing the major steps needed.
+2. A numbered Plan covering the major steps.
 
-The plan should consider:
-- identifying obvious rule-based messages first,
-- using the model only where reasoning is required,
-- retrieving earlier messages when context is needed,
-- identifying actions that require human approval,
-- detecting suspicious or hostile instructions,
-- recording decisions and evidence,
-- producing the required final results.
+Consider:
+- rule-based handling before the model
+- retrieving earlier messages when context is needed
+- suspicious or hostile instructions
+- human approval for irreversible actions
+- recording decisions and evidence
+- producing the required results
 
-Do not execute any action.
-Do not invent information about messages that has not been provided.
+Do not execute actions.
+Do not invent information.
 
-Format the response exactly as:
+Format:
 
 Goal:
 <short statement>
@@ -49,29 +32,22 @@ Plan:
 """.strip()
 
 
-def create_plan(user_question: str) -> str:
-    """
-    Ask the configured LLM to generate a Goal and Plan.
-    """
+def create_plan(user_question):
     prompt = (
         f"User request:\n{user_question}\n\n"
         "Create the Goal and Plan for this request."
     )
-
     return chat(prompt, system=PLANNER_SYSTEM)
 
 
-def display_plan(plan_text: str) -> None:
-    """
-    Display the generated plan before execution begins.
-    """
+def display_plan(plan_text):
     print("\n--- Planning Stage ---")
     print(plan_text.strip())
     print("----------------------\n")
 
 
 if __name__ == "__main__":
-    sample_question = "Process the inbox and identify what needs my attention."
-
-    plan = create_plan(sample_question)
+    plan = create_plan(
+        "Process the inbox and identify what needs my attention."
+    )
     display_plan(plan)
