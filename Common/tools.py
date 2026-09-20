@@ -1,155 +1,339 @@
-# tools.py (Assignment 5 extension)
-# Roll number: evernorth-aai-1155338
-
 """
-Tools for FlightOps Agent.
-Each function provides operational data by reading from mock dictionaries in data.py.
+InboxHero tools.
+
+These tools provide inbox retrieval, search, persistent memory,
+disposition recording, and reversible message actions.
+
+Irreversible actions such as send/delete are intentionally not
+implemented here. They will be added behind the safety gate.
 """
 
+import json
+from datetime import datetime
+from pathlib import Path
 
-from Common.data import AIRCRAFT, FLIGHTS, MAINTENANCE, PASSENGERS, WEATHER
-import memory   # new import
+import memory
+from Common.data import (
+    get_message,
+    get_thread,
+    search_messages,
+    get_unread_messages,
+    load_inbox,
+)
 
-from Common.data import AIRCRAFT, FLIGHTS, MAINTENANCE, PASSENGERS, WEATHER
 
-# Gate inventory per terminal – used to find gates not currently assigned
-TERMINAL_GATES = {
-    "T1": ["A1", "A2", "A3", "B1", "D18", "D19"],
-    "T2": ["B5", "B6", "B7", "B8", "C1"],
-    "T3": ["A10", "A11", "A12", "C3", "C4", "C5"],
+# ------------------------------------------------------------------
+# Project paths
+# ------------------------------------------------------------------
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+DECISIONS_FILE = PROJECT_ROOT / "decisions.json"
+MESSAGE_STATE_FILE = PROJECT_ROOT / "message_state.json"
+
+
+# ------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------
+
+VALID_DISPOSITIONS = {
+    "reply",
+    "archive",
+    "defer",
+    "delegate",
+    "escalate",
 }
 
-# Map city names to IATA codes
-CITY_TO_AIRPORT = {
-    "delhi": "DEL",
-    "mumbai": "BOM",
-    "bangalore": "BLR",
-    "kochi": "COK",
-    "hyderabad": "HYD",
-    "kolkata": "CCU",
-    "chennai": "MAA",
+
+VALID_REVERSIBLE_ACTIONS = {
+    "draft",
+    "label",
+    "archive",
+    "defer",
+    "delegate",
 }
 
 
-def get_flight_status(flight_number: str) -> dict:
-    """
-    Return status, gate, departure time, and delay for a flight.
-    """
-    flight = FLIGHTS.get(flight_number.upper())
-    if not flight:
-        return {"message": f"No flight found with number {flight_number}."}
+# ------------------------------------------------------------------
+# Internal JSON helpers
+# ------------------------------------------------------------------
 
-    return {
-        "status": flight["status"],
-        "gate": flight["gate"],
-        "departure_time": flight["departure_time"],
-        "delay_minutes": flight["delay_minutes"],
-    }
+def _load_json(file_path: Path, default):
+    """Load JSON from disk or return the supplied default."""
+    if not file_path.exists():
+        return default
+
+    try:
+        with file_path.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return default
 
 
-def search_passenger(name: str) -> dict:
+def _save_json(file_path: Path, data):
+    """Save JSON to disk."""
+    with file_path.open("w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+
+
+# ------------------------------------------------------------------
+# Inbox retrieval tools
+# ------------------------------------------------------------------
+
+def list_messages() -> list:
     """
-    Return booking reference, seat, and destination for a passenger.
+    Return all messages in the inbox.
     """
-    for passenger_name, info in PASSENGERS.items():
-        if passenger_name.lower() == name.lower():
-            return {
-                "booking_reference": info["booking_reference"],
-                "seat": info["seat"],
-                "destination": info["destination"],
+    return load_inbox()
+
+
+def get_message_by_id(message_id: str) -> dict:
+    """
+    Retrieve a single message by ID.
+    """
+    message = get_message(message_id)
+
+    if message is None:
+        return {
+            "message": f"No message found with ID {message_id}."
+        }
+
+    return message
+
+
+def get_email_thread(thread_id: str) -> list:
+    """
+    Retrieve all messages in a thread in timestamp order.
+    """
+    thread = get_thread(thread_id)
+
+    if not thread:
+        return [
+            {
+                "message": f"No thread found with ID {thread_id}."
             }
-    return {"message": f"No passenger found with name {name}."}
+        ]
+
+    return thread
 
 
-def maintenance_history(tail_number: str) -> dict:
+def search_inbox(query: str) -> list:
     """
-    Return last inspection date, hours flown, and outstanding issues for an aircraft.
+    Search sender, recipient, subject, and body text.
     """
-    record = MAINTENANCE.get(tail_number.upper())
-    if not record:
-        return {"message": f"No maintenance record found for tail number {tail_number}."}
+    return search_messages(query)
+
+
+def list_unread_messages() -> list:
+    """
+    Return all unread messages.
+    """
+    return get_unread_messages()
+
+
+def get_inbox_summary() -> dict:
+    """
+    Return basic inbox statistics.
+    """
+    messages = load_inbox()
+
+    unread_count = sum(
+        1 for message in messages
+        if message.get("unread") is True
+    )
 
     return {
-        "last_inspection_date": record["last_inspection_date"],
-        "hours_flown": record["hours_flown"],
-        "outstanding_issues": record["outstanding_issues"],
+        "total_messages": len(messages),
+        "unread_messages": unread_count,
     }
 
 
-def find_available_gate(terminal: str) -> dict:
-    """
-    Return an open gate number for the given terminal.
-    """
-    terminal_key = terminal.upper()
-    if not terminal_key.startswith("T"):
-        terminal_key = f"T{terminal_key}"
+# ------------------------------------------------------------------
+# Disposition tools
+# ------------------------------------------------------------------
 
-    gates = TERMINAL_GATES.get(terminal_key)
-    if not gates:
-        return {"message": f"No gates listed for terminal {terminal}."}
+def record_disposition(
+    message_id: str,
+    disposition: str,
+    reason: str,
+) -> dict:
+    """
+    Assign exactly one disposition and reason to a message.
 
-    # Find gates already occupied
-    occupied = {
-        flight["gate"]
-        for flight in FLIGHTS.values()
-        if flight.get("terminal") == terminal_key and flight.get("gate")
+    Existing decisions for the same message are replaced so that
+    each message has one current disposition.
+    """
+    disposition = disposition.lower().strip()
+
+    if disposition not in VALID_DISPOSITIONS:
+        return {
+            "error": (
+                f"Invalid disposition '{disposition}'. "
+                f"Allowed values: {sorted(VALID_DISPOSITIONS)}"
+            )
+        }
+
+    message = get_message(message_id)
+
+    if message is None:
+        return {
+            "error": f"No message found with ID {message_id}."
+        }
+
+    decisions = _load_json(DECISIONS_FILE, {})
+
+    decisions[message_id] = {
+        "disposition": disposition,
+        "reason": reason.strip(),
+        "timestamp": datetime.now().isoformat(),
     }
-    available = [gate for gate in gates if gate not in occupied]
 
-    if not available:
-        return {"message": f"No open gates available at terminal {terminal_key}."}
-
-    return {"gate": available[0]}
-
-
-def get_weather(airport: str) -> dict:
-    """
-    Return visibility, wind, and temperature for an airport.
-    Accepts either IATA code or city name.
-    """
-    airport_key = airport.upper()
-    if airport_key not in WEATHER:
-        airport_key = CITY_TO_AIRPORT.get(airport.lower(), airport_key)
-
-    record = WEATHER.get(airport_key)
-    if not record:
-        return {"message": f"No weather data found for airport {airport}."}
+    _save_json(DECISIONS_FILE, decisions)
 
     return {
-        "visibility_km": record["visibility_km"],
-        "wind": record["wind"],
-        "temperature_c": record["temperature_c"],
+        "message_id": message_id,
+        "disposition": disposition,
+        "reason": reason.strip(),
     }
 
 
-def lookup_aircraft(aircraft_type: str) -> dict:
+def get_disposition(message_id: str) -> dict:
     """
-    Return dimensions, capacity, and fuel figures for an aircraft type.
+    Retrieve the current disposition for a message.
     """
-    record = AIRCRAFT.get(aircraft_type)
-    if not record:
-        return {"message": f"No aircraft data found for type {aircraft_type}."}
+    decisions = _load_json(DECISIONS_FILE, {})
+
+    decision = decisions.get(message_id)
+
+    if decision is None:
+        return {
+            "message_id": message_id,
+            "disposition": None,
+        }
 
     return {
-        "length_m": record["length_m"],
-        "wingspan_m": record["wingspan_m"],
-        "capacity": record["capacity"],
-        "fuel_capacity_liters": record["fuel_capacity_liters"],
+        "message_id": message_id,
+        **decision,
     }
 
 
-def remember(key: str, value: str, source: str = "manual") -> dict:
+def get_all_dispositions() -> dict:
     """
-    Store a fact persistently in memory_store.json.
+    Return all recorded message dispositions.
+    """
+    return _load_json(DECISIONS_FILE, {})
+
+
+def get_undecided_messages() -> list:
+    """
+    Return messages that currently have no disposition.
+    """
+    decisions = _load_json(DECISIONS_FILE, {})
+    messages = load_inbox()
+
+    return [
+        message["id"]
+        for message in messages
+        if message["id"] not in decisions
+    ]
+
+
+# ------------------------------------------------------------------
+# Reversible actions
+# ------------------------------------------------------------------
+
+def apply_reversible_action(
+    message_id: str,
+    action: str,
+    details: dict | None = None,
+) -> dict:
+    """
+    Record/perform a reversible inbox action.
+
+    Supported actions:
+        draft
+        label
+        archive
+        defer
+        delegate
+
+    No irreversible action is accepted here.
+    """
+    action = action.lower().strip()
+
+    if action not in VALID_REVERSIBLE_ACTIONS:
+        return {
+            "error": (
+                f"Action '{action}' is not a permitted reversible action."
+            )
+        }
+
+    message = get_message(message_id)
+
+    if message is None:
+        return {
+            "error": f"No message found with ID {message_id}."
+        }
+
+    state = _load_json(MESSAGE_STATE_FILE, {})
+    message_actions = state.setdefault("actions", [])
+
+    action_record = {
+        "message_id": message_id,
+        "action": action,
+        "details": details or {},
+        "timestamp": datetime.now().isoformat(),
+    }
+
+    message_actions.append(action_record)
+
+    _save_json(MESSAGE_STATE_FILE, state)
+
+    return {
+        "status": "completed",
+        **action_record,
+    }
+
+
+# ------------------------------------------------------------------
+# Persistent memory tools
+# ------------------------------------------------------------------
+
+def remember(
+    key: str,
+    value: str,
+    source: str = "manual",
+) -> dict:
+    """
+    Store a persistent preference or fact.
     """
     result = memory.remember(key, value, source)
-    return {"message": result}
+
+    return {
+        "message": result,
+    }
+
 
 def recall(query: str) -> dict:
     """
-    Retrieve a fact from persistent memory_store.json.
+    Retrieve a persistent preference or fact.
     """
     result = memory.recall(query)
+
     if result:
-        return {"value": result["value"], "source": result["source"], "timestamp": result["timestamp"]}
-    return {"message": f"No memory found for {query}."}
+        return {
+            "value": result["value"],
+            "source": result["source"],
+            "timestamp": result["timestamp"],
+        }
+
+    return {
+        "message": f"No memory found for {query}."
+    }
+
+
+def summarize_memory() -> list:
+    """
+    Return all persistent memory items in readable form.
+    """
+    return memory.summarize_memory()
