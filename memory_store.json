@@ -1,1 +1,7 @@
-{}
+{
+  "mcp_test": {
+    "value": "works",
+    "source": "test",
+    "timestamp": "2026-09-21T03:36:34.079558"
+  }
+}
