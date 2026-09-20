@@ -1,9 +1,3 @@
-"""
-Actions that can change the inbox state.
-
-Send and delete are irreversible, so both go through the safety gate.
-"""
-
 import json
 from datetime import datetime
 from pathlib import Path
@@ -13,13 +7,12 @@ from safety import require_approval
 from trace import log_event
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent
-OUTBOX_DIR = PROJECT_ROOT / "outbox"
-DELETED_FILE = PROJECT_ROOT / "deleted_messages.json"
+ROOT = Path(__file__).resolve().parent
+OUTBOX_DIR = ROOT / "outbox"
+DELETED_FILE = ROOT / "deleted_messages.json"
 
 
 def _load_deleted():
-    """Load the list of deleted message IDs."""
     if not DELETED_FILE.exists():
         return []
 
@@ -30,31 +23,14 @@ def _load_deleted():
         return []
 
 
-def _save_deleted(message_ids):
-    """Save deleted message IDs."""
+def _save_deleted(ids):
     with DELETED_FILE.open("w", encoding="utf-8") as f:
-        json.dump(message_ids, f, indent=2)
+        json.dump(ids, f, indent=2)
 
 
-def send_message(
-    message_id: str,
-    to: str,
-    subject: str,
-    body: str,
-    dry_run: bool = False,
-) -> dict:
-    """
-    Send a message after passing the safety gate.
-
-    In this assignment, sending means writing one JSON file
-    to the outbox directory.
-    """
-    message = get_message(message_id)
-
-    if message is None:
-        return {
-            "error": f"No message found with ID {message_id}."
-        }
+def send_message(message_id, to, subject, body, dry_run=False):
+    if get_message(message_id) is None:
+        return {"error": f"No message found with ID {message_id}."}
 
     details = {
         "to": to,
@@ -62,14 +38,12 @@ def send_message(
         "body": body,
     }
 
-    approved = require_approval(
+    if not require_approval(
         "send",
         message_id,
         details,
         dry_run=dry_run,
-    )
-
-    if not approved:
+    ):
         return {
             "status": "not_sent",
             "message_id": message_id,
@@ -105,33 +79,20 @@ def send_message(
     }
 
 
-def delete_message(
-    message_id: str,
-    dry_run: bool = False,
-) -> dict:
-    """
-    Delete a message after passing the safety gate.
-
-    The original inbox.json is kept unchanged. Deleted IDs are
-    recorded separately so the supplied source data remains intact.
-    """
+def delete_message(message_id, dry_run=False):
     message = get_message(message_id)
 
     if message is None:
-        return {
-            "error": f"No message found with ID {message_id}."
-        }
+        return {"error": f"No message found with ID {message_id}."}
 
-    approved = require_approval(
+    details = {"subject": message.get("subject", "")}
+
+    if not require_approval(
         "delete",
         message_id,
-        {
-            "subject": message.get("subject", ""),
-        },
+        details,
         dry_run=dry_run,
-    )
-
-    if not approved:
+    ):
         return {
             "status": "not_deleted",
             "message_id": message_id,
