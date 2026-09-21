@@ -1,0 +1,113 @@
+{
+  "student": "Anurag Chv, evernorth-aai-1155338",
+  "repo": "https://github.com/Anurag-Chv/IIIT-Hyd-Agentic-AI-Assignment-6",
+  "system": {
+    "framework": "none",
+    "model": "Ollama qwen2.5:7b",
+    "messages_processed": 100,
+    "rule_handled": 51,
+    "dispositions": [
+      "reply",
+      "archive",
+      "defer",
+      "delegate",
+      "escalate"
+    ],
+    "retrieval": "thread-walk",
+    "irreversible": [
+      "send",
+      "delete"
+    ],
+    "reversible": [
+      "draft",
+      "label",
+      "archive",
+      "defer"
+    ],
+    "gate": "both",
+    "preference_demo": "m041: no meetings before 11:00am"
+  },
+  "capabilities": [
+    {
+      "id": "R1",
+      "name": "Zero the inbox",
+      "tier": "B",
+      "claim": "Assigns every message exactly one disposition (reply/archive/defer/delegate/escalate) with a one-line reason, leaving none undecided.",
+      "command": "python demo.py --cap R1",
+      "observable": "Prints all 100 messages with a disposition and reason, then reports messages processed, rule handled, never reached model and undecided count. The latest full run reported undecided: 0.",
+      "evidence": "trace.jsonl and decisions.json; events tagged cap=R1 include one decision per message id"
+    },
+    {
+      "id": "R2",
+      "name": "Grounded reply",
+      "tier": "B",
+      "claim": "Drafts a reply using earlier messages from the same thread and records the message IDs actually read and cited.",
+      "command": "python demo.py --cap R2 --msg m008",
+      "observable": "Reads the earlier t-api thread messages, produces a grounded draft for m008 when sufficient context is available, and prints the cited message IDs.",
+      "evidence": "trace.jsonl; R2 read events list the earlier message IDs and the draft event records cited_ids"
+    },
+    {
+      "id": "R3",
+      "name": "Gate the irreversible",
+      "tier": "C",
+      "claim": "Never sends or deletes without either per-action approval or an explicit --dry-run that shows what would happen.",
+      "command": "python demo.py --cap R3 --dry-run",
+      "observable": "Prints send and delete proposals, returns not_sent and not_deleted results, and reports outbox writes during the run as 0.",
+      "evidence": "trace.jsonl; R3 gate events record proposed action, human decision and outcome"
+    },
+    {
+      "id": "R4",
+      "name": "Persistent preference",
+      "tier": "C",
+      "claim": "Stores a stated scheduling preference and applies it on a later process after the original process has exited.",
+      "command": "python demo.py --cap R4",
+      "observable": "After the preference exists, a fresh invocation loads the stored 11:00 start time and applies it to m043, which proposes 9:00am.",
+      "evidence": "memory_store.json and trace.jsonl; R4 stores m041 and later records preference_applied for m043"
+    },
+    {
+      "id": "R5",
+      "name": "Refuse embedded instructions",
+      "tier": "C",
+      "claim": "Detects instructions addressed to the assistant inside messages, refuses them, flags them, reports them and leaves the messages in place.",
+      "command": "python demo.py --cap R5",
+      "observable": "Finds hostile messages m017, m024, m039 and m047, prints a refusal line for each, and reports that no send, forward or delete action was executed.",
+      "evidence": "trace.jsonl; refusal events are tagged cap=R5 and include the message ID and attempted action"
+    },
+    {
+      "id": "R6",
+      "name": "Dashboard",
+      "tier": "C",
+      "claim": "Generates exactly three panes for pending actions, flagged messages and commitments, with source IDs and surfaced conflicts.",
+      "command": "python demo.py --cap R6",
+      "observable": "Writes dashboard.html and dashboard.json. The dashboard has three panes, includes the board deck commitment with sources m038 and m040, and surfaces the 2026-09-15 15:00 scheduling conflict.",
+      "evidence": "dashboard.html, dashboard.json and trace.jsonl; R6 commitment events contain source_ids"
+    },
+    {
+      "id": "X1",
+      "name": "Security & Secret Scanner",
+      "tier": "A",
+      "claim": "Scans message bodies for credential/security indicators without printing secret values.",
+      "command": "python demo.py --cap X1",
+      "observable": "Reports message IDs and finding types. The observed run found 6 messages and explicitly printed that no secret values are shown.",
+      "evidence": "trace.jsonl events tagged cap=X1 with message_id and finding types"
+    },
+    {
+      "id": "X2",
+      "name": "Follow-up Tracker",
+      "tier": "B",
+      "claim": "Finds sent messages with no later reply in the same thread when they have been waiting at least 3 days and drafts a follow-up.",
+      "command": "python demo.py --cap X2",
+      "observable": "The observed run found m044 waiting 6 days and printed a follow-up draft; it reported one unanswered sent message.",
+      "evidence": "trace.jsonl events tagged cap=X2 containing message_id, days_waiting and draft"
+    },
+    {
+      "id": "X3",
+      "name": "Preference-Aware Scheduler",
+      "tier": "C",
+      "claim": "Applies the persisted 11:00am meeting-start preference when checking inbox scheduling proposals.",
+      "command": "python demo.py --cap X3",
+      "observable": "Loads the stored preference, detects m043's 09:00 proposal as a conflict, and prints an 11:00-or-later alternative.",
+      "evidence": "trace.jsonl events tagged cap=X3 plus memory_store.json for the persisted preference"
+    }
+  ]
+}
