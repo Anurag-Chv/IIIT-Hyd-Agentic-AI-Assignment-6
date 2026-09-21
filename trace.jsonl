@@ -353,3 +353,11 @@
 {"timestamp": "2026-09-22T02:50:04.822457", "event": "commitment", "cap": "R6", "title": "Board deck circulated before board review", "source_ids": ["m038", "m040"]}
 {"timestamp": "2026-09-22T02:50:04.823500", "event": "commitment", "cap": "R6", "title": "Northwind VC intro call", "source_ids": ["m010"]}
 {"timestamp": "2026-09-22T02:50:04.824387", "event": "commitment", "cap": "R6", "title": "Dental cleaning", "source_ids": ["m061"]}
+{"timestamp": "2026-09-22T02:59:51.357935", "event": "capability", "cap": "X1", "message_id": "m003", "types": ["AMQP credential URL"]}
+{"timestamp": "2026-09-22T02:59:51.358451", "event": "capability", "cap": "X1", "message_id": "m088", "types": ["account credential"]}
+{"timestamp": "2026-09-22T02:59:51.359073", "event": "capability", "cap": "X1", "message_id": "m105", "types": ["account credential"]}
+{"timestamp": "2026-09-22T02:59:51.359580", "event": "capability", "cap": "X1", "message_id": "m114", "types": ["account credential"]}
+{"timestamp": "2026-09-22T02:59:51.360258", "event": "capability", "cap": "X1", "message_id": "m021", "types": ["account credential"]}
+{"timestamp": "2026-09-22T02:59:51.360617", "event": "capability", "cap": "X1", "message_id": "m045", "types": ["account credential"]}
+{"timestamp": "2026-09-22T02:59:55.777713", "event": "capability", "cap": "X2", "message_id": "m044", "days_waiting": 6, "draft": "Hi, just following up on my earlier note: Re: contractor invoice approval. Please let me know when you get a chance."}
+{"timestamp": "2026-09-22T02:59:59.403283", "event": "capability", "cap": "X3", "message_id": "m043", "proposed_time": "09:00", "alternative": "11:00", "source_id": "m041"}

@@ -1,5 +1,6 @@
 import argparse
 import json
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -124,7 +125,6 @@ def run_r4():
     print("Message m043 proposes Monday at 9:00am.")
     print("InboxHero does not accept 9:00am and proposes 11:00am instead.")
 
-
     log_event(
         "preference_applied",
         cap="R4",
@@ -230,6 +230,131 @@ def run_r6(run_workflow=True, workflow_result=None):
         )
 
 
+def run_x1():
+    print("\n=== X1: Security & Secret Scanner ===")
+
+    patterns = [
+        ("embedded credential URL", re.compile(r"https?://[^\s/@]+:[^\s/@]+@")),
+        ("AMQP credential URL", re.compile(r"amqps?://[^\s/@]+:[^\s/@]+@")),
+        ("account credential", re.compile(r"\b(account|password|secret|api[_ -]?key|token)\b", re.I)),
+    ]
+
+    findings = []
+
+    for message in load_inbox():
+        hits = [name for name, pattern in patterns if pattern.search(message["body"])]
+        if not hits:
+            continue
+
+        finding = {
+            "message_id": message["id"],
+            "types": sorted(set(hits)),
+        }
+        findings.append(finding)
+
+        log_event("capability", cap="X1", **finding)
+        print(f"FOUND: {message['id']} | {', '.join(finding['types'])}")
+
+    print(f"\nPotential secret/security messages: {len(findings)}")
+    print("No secret values are printed.")
+
+
+def run_x2():
+    print("\n=== X2: Follow-up Tracker ===")
+
+    messages = load_inbox()
+    threads = {}
+
+    for message in messages:
+        threads.setdefault(message["thread_id"], []).append(message)
+
+    latest_time = max(datetime.fromisoformat(m["timestamp"]) for m in messages)
+    pending = []
+
+    for message in messages:
+        if message["from"] != "sam@paperjet.io" or message["to"] == "sam@paperjet.io":
+            continue
+
+        thread = threads[message["thread_id"]]
+        later_reply = any(
+            datetime.fromisoformat(item["timestamp"]) > datetime.fromisoformat(message["timestamp"])
+            and item["from"] != "sam@paperjet.io"
+            for item in thread
+        )
+
+        if later_reply:
+            continue
+
+        days_waiting = (latest_time - datetime.fromisoformat(message["timestamp"])).days
+        if days_waiting < 3:
+            continue
+
+        item = {
+            "message_id": message["id"],
+            "days_waiting": days_waiting,
+            "draft": f"Hi, just following up on my earlier note: {message['subject']}. Please let me know when you get a chance.",
+        }
+        pending.append(item)
+
+        log_event("capability", cap="X2", **item)
+        print(f"FOLLOW-UP: {message['id']} | waiting {days_waiting} days")
+        print(f"  Draft: {item['draft']}")
+
+    print(f"\nUnanswered sent messages: {len(pending)}")
+
+
+def run_x3():
+    print("\n=== X3: Preference-Aware Scheduler ===")
+
+    key = "meeting_start"
+    preference = recall(key)
+
+    if preference is None:
+        remember(key, "11:00", "m041: no meetings before 11:00am")
+        preference = recall(key)
+        print("Loaded scheduling preference from m041 into persistent memory.")
+
+    start_time = preference["value"]
+    start_hour, start_minute = map(int, start_time.split(":"))
+    conflicts = []
+
+    for message in load_inbox():
+        if message["id"] == "m041":
+            continue
+
+        if not re.search(r"\b(meeting|call|demo|1:1|slot)\b", message["subject"] + " " + message["body"], re.I):
+            continue
+
+        times = re.findall(r"\b(?:at\s*)?(\d{1,2}):(\d{2})\s*(am|pm)?\b", message["body"], re.I)
+        for hour, minute, period in times:
+            hour = int(hour)
+            minute = int(minute)
+            if period and period.lower() == "pm" and hour != 12:
+                hour += 12
+            elif period and period.lower() == "am" and hour == 12:
+                hour = 0
+
+            proposed = hour * 60 + minute
+            allowed = start_hour * 60 + start_minute
+            if proposed < allowed:
+                conflicts.append({
+                    "message_id": message["id"],
+                    "proposed_time": f"{hour:02d}:{minute:02d}",
+                    "alternative": start_time,
+                    "source_id": "m041",
+                })
+                break
+
+    for item in conflicts:
+        log_event("capability", cap="X3", **item)
+        print(
+            f"CONFLICT: {item['message_id']} proposes {item['proposed_time']} "
+            f"before preference; propose {item['alternative']} or later."
+        )
+
+    print(f"\nScheduling conflicts: {len(conflicts)}")
+
+
 def run_all():
     result = run_r1()
     run_r2("m008")
@@ -237,11 +362,17 @@ def run_all():
     run_r4()
     run_r5()
     run_r6(run_workflow=False, workflow_result=result)
+    run_x1()
+    run_x2()
+    run_x3()
 
 
 def main():
     parser = argparse.ArgumentParser(description="InboxHero capability runner")
-    parser.add_argument("--cap", choices=["R1", "R2", "R3", "R4", "R5", "R6"])
+    parser.add_argument(
+        "--cap",
+        choices=["R1", "R2", "R3", "R4", "R5", "R6", "X1", "X2", "X3"],
+    )
     parser.add_argument("--msg", default="m008")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--all", action="store_true")
@@ -253,7 +384,7 @@ def main():
         return
 
     if not args.cap:
-        parser.error("Use --cap R1..R6 or --all")
+        parser.error("Use --cap R1..R6, X1..X3 or --all")
 
     if args.cap == "R1":
         run_r1()
@@ -267,6 +398,12 @@ def main():
         run_r5()
     elif args.cap == "R6":
         run_r6()
+    elif args.cap == "X1":
+        run_x1()
+    elif args.cap == "X2":
+        run_x2()
+    elif args.cap == "X3":
+        run_x3()
 
 
 if __name__ == "__main__":
