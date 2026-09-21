@@ -63,12 +63,12 @@
     {
       "message_id": "m030",
       "action": "reply",
-      "reason": "Specific task assigned, requires approval."
+      "reason": "Specific task assigned to Sam, requires response."
     },
     {
       "message_id": "m033",
       "action": "reply",
-      "reason": "Collaborative document, feedback needed."
+      "reason": "Feedback request, requires response."
     },
     {
       "message_id": "m051",
@@ -88,7 +88,7 @@
     {
       "message_id": "m042",
       "action": "reply",
-      "reason": "Follow-up on backend role application"
+      "reason": "Follow-up on backend role"
     },
     {
       "message_id": "m012",
@@ -103,7 +103,7 @@
     {
       "message_id": "m046",
       "action": "reply",
-      "reason": "Request for information on product launch coverage."
+      "reason": "Request for information about product launch coverage."
     },
     {
       "message_id": "m019",
