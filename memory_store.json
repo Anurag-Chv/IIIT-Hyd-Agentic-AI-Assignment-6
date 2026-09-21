@@ -3,5 +3,10 @@
     "value": "11:00",
     "source": "m041",
     "timestamp": "2026-09-22T03:13:58.824669"
+  },
+  "mcp_test": {
+    "value": "works",
+    "source": "test",
+    "timestamp": "2026-09-22T03:34:58.794911"
   }
 }
