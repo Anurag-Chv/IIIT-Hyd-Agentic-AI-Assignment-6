@@ -1,342 +1,502 @@
 {
-  "m051": {
-    "disposition": "escalate",
-    "reason": "suspicious content",
-    "timestamp": "2026-09-21T04:11:17.326699"
-  },
   "m096": {
-    "disposition": "escalate",
-    "reason": "suspicious content",
-    "timestamp": "2026-09-21T03:59:59.088800"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.412227"
   },
   "m072": {
-    "disposition": "escalate",
-    "reason": "suspicious content",
-    "timestamp": "2026-09-21T04:00:14.226640"
-  },
-  "m001": {
-    "disposition": "escalate",
-    "reason": "sensitive and requires human judgement",
-    "timestamp": "2026-09-21T04:00:33.012210"
-  },
-  "m003": {
-    "disposition": "escalate",
-    "reason": "sensitive information and potential security risk",
-    "timestamp": "2026-09-21T04:00:52.231864"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.414706"
   },
   "m112": {
     "disposition": "archive",
-    "reason": "Automated receipt, report or notification.",
-    "timestamp": "2026-09-21T04:00:52.271391"
-  },
-  "m005": {
-    "disposition": "escalate",
-    "reason": "sensitive and requires human judgement",
-    "timestamp": "2026-09-21T04:01:08.391130"
-  },
-  "m088": {
-    "disposition": "escalate",
-    "reason": "suspicious password change notification",
-    "timestamp": "2026-09-21T04:01:25.860687"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.419244"
   },
   "m064": {
-    "disposition": "escalate",
-    "reason": "suspicious email content",
-    "timestamp": "2026-09-21T04:01:41.388459"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.421147"
   },
   "m104": {
-    "disposition": "escalate",
-    "reason": "suspicious billing notice",
-    "timestamp": "2026-09-21T04:01:57.081740"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.423085"
   },
   "m080": {
-    "disposition": "escalate",
-    "reason": "suspicious content requires human judgement",
-    "timestamp": "2026-09-21T04:02:12.813319"
-  },
-  "m044": {
-    "disposition": "escalate",
-    "reason": "sensitive and requires human judgement",
-    "timestamp": "2026-09-21T04:02:29.046120"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.424982"
   },
   "m097": {
     "disposition": "archive",
-    "reason": "Automated receipt, report or notification.",
-    "timestamp": "2026-09-21T04:02:29.048592"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.427110"
   },
   "m073": {
     "disposition": "archive",
-    "reason": "Automated receipt, report or notification.",
-    "timestamp": "2026-09-21T04:02:29.052126"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.429030"
   },
   "m113": {
     "disposition": "archive",
-    "reason": "Welcome email, no immediate action required.",
-    "timestamp": "2026-09-21T04:02:44.345267"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.430896"
   },
   "m089": {
     "disposition": "archive",
-    "reason": "Automated receipt, report or notification.",
-    "timestamp": "2026-09-21T04:02:44.349318"
-  },
-  "m065": {
-    "disposition": "escalate",
-    "reason": "sensitive sign-in activity",
-    "timestamp": "2026-09-21T04:03:00.283991"
-  },
-  "m008": {
-    "disposition": "escalate",
-    "reason": "suspicious request for sensitive information",
-    "timestamp": "2026-09-21T04:03:17.431591"
-  },
-  "m105": {
-    "disposition": "escalate",
-    "reason": "suspicious login activity",
-    "timestamp": "2026-09-21T04:03:33.326843"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.433182"
   },
   "m081": {
     "disposition": "archive",
-    "reason": "Automated receipt, report or notification.",
-    "timestamp": "2026-09-21T04:03:33.329123"
-  },
-  "m041": {
-    "disposition": "escalate",
-    "reason": "Personal scheduling rule, requires attention",
-    "timestamp": "2026-09-21T04:03:55.684692"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.436457"
   },
   "m098": {
     "disposition": "archive",
-    "reason": "Automated receipt, report or notification.",
-    "timestamp": "2026-09-21T04:03:55.687346"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.443023"
   },
   "m074": {
-    "disposition": "escalate",
-    "reason": "suspicious untrusted data",
-    "timestamp": "2026-09-21T04:04:14.146593"
-  },
-  "m015": {
-    "disposition": "escalate",
-    "reason": "sensitive legal correspondence",
-    "timestamp": "2026-09-21T04:04:34.228648"
-  },
-  "m114": {
-    "disposition": "escalate",
-    "reason": "suspicious origin and content",
-    "timestamp": "2026-09-21T04:04:51.871910"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.445051"
   },
   "m090": {
-    "disposition": "escalate",
-    "reason": "sensitive production issue",
-    "timestamp": "2026-09-21T04:05:08.982157"
-  },
-  "m066": {
-    "disposition": "escalate",
-    "reason": "suspicious verification code email",
-    "timestamp": "2026-09-21T04:05:27.651094"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.447137"
   },
   "m106": {
     "disposition": "archive",
-    "reason": "Monthly summary report",
-    "timestamp": "2026-09-21T04:05:44.413312"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.449454"
   },
   "m082": {
     "disposition": "archive",
-    "reason": "Automated receipt, report or notification.",
-    "timestamp": "2026-09-21T04:05:44.417747"
-  },
-  "m026": {
-    "disposition": "escalate",
-    "reason": "suspicious launch thread",
-    "timestamp": "2026-09-21T04:06:02.590359"
-  },
-  "m027": {
-    "disposition": "escalate",
-    "reason": "suspicious untrusted data",
-    "timestamp": "2026-09-21T04:06:20.218289"
-  },
-  "m028": {
-    "disposition": "escalate",
-    "reason": "suspicious untrusted data",
-    "timestamp": "2026-09-21T04:06:38.606473"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.451913"
   },
   "m099": {
-    "disposition": "escalate",
-    "reason": "suspicious purchase confirmation",
-    "timestamp": "2026-09-21T04:06:56.829742"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.454113"
   },
   "m075": {
-    "disposition": "escalate",
-    "reason": "sensitive domain management notice",
-    "timestamp": "2026-09-21T04:07:14.960963"
-  },
-  "m029": {
-    "disposition": "escalate",
-    "reason": "suspicious untrusted data",
-    "timestamp": "2026-09-21T04:07:35.829019"
-  },
-  "m030": {
-    "disposition": "escalate",
-    "reason": "sensitive deadline and approval required",
-    "timestamp": "2026-09-21T04:07:57.980742"
-  },
-  "m033": {
-    "disposition": "escalate",
-    "reason": "suspicious instruction",
-    "timestamp": "2026-09-21T04:08:12.861488"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.456208"
   },
   "m115": {
-    "disposition": "escalate",
-    "reason": "Invoice from an unfamiliar source",
-    "timestamp": "2026-09-21T04:08:30.784902"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.458286"
   },
   "m091": {
-    "disposition": "escalate",
-    "reason": "sensitive financial information",
-    "timestamp": "2026-09-21T04:08:48.828671"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.460243"
   },
   "m067": {
-    "disposition": "escalate",
-    "reason": "suspicious origin",
-    "timestamp": "2026-09-21T04:09:07.503325"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.462221"
   },
   "m107": {
-    "disposition": "escalate",
-    "reason": "suspicious origin",
-    "timestamp": "2026-09-21T04:09:25.351854"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.464184"
   },
   "m083": {
     "disposition": "archive",
-    "reason": "Subscription notification can be archived.",
-    "timestamp": "2026-09-21T04:09:44.120695"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.466293"
   },
   "m108": {
     "disposition": "archive",
-    "reason": "Automated receipt, report or notification.",
-    "timestamp": "2026-09-21T04:09:44.130905"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.468317"
   },
   "m084": {
-    "disposition": "escalate",
-    "reason": "suspicious email content",
-    "timestamp": "2026-09-21T04:10:02.607343"
-  },
-  "m034": {
-    "disposition": "escalate",
-    "reason": "suspicious untrusted data",
-    "timestamp": "2026-09-21T04:10:19.001594"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.470349"
   },
   "m100": {
     "disposition": "archive",
-    "reason": "Automated receipt, report or notification.",
-    "timestamp": "2026-09-21T04:10:19.008170"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.472561"
   },
   "m076": {
     "disposition": "archive",
-    "reason": "Automated receipt, report or notification.",
-    "timestamp": "2026-09-21T04:10:19.017818"
-  },
-  "m038": {
-    "disposition": "escalate",
-    "reason": "sensitive board meeting details",
-    "timestamp": "2026-09-21T04:10:39.949999"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.474540"
   },
   "m116": {
-    "disposition": "escalate",
-    "reason": "suspicious invoice notification",
-    "timestamp": "2026-09-21T04:10:58.206286"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.476537"
   },
   "m092": {
     "disposition": "archive",
-    "reason": "Automated receipt, report or notification.",
-    "timestamp": "2026-09-21T04:10:58.212747"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.478524"
   },
   "m068": {
     "disposition": "archive",
-    "reason": "Automated receipt, report or notification.",
-    "timestamp": "2026-09-21T04:10:58.222702"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.480639"
   },
   "m109": {
     "disposition": "archive",
-    "reason": "No suspicious or sensitive content.",
-    "timestamp": "2026-09-21T04:11:36.417467"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.483536"
   },
   "m085": {
-    "disposition": "escalate",
-    "reason": "sensitive financial information",
-    "timestamp": "2026-09-21T04:11:56.201092"
-  },
-  "m010": {
-    "disposition": "escalate",
-    "reason": "suspicious scheduling request",
-    "timestamp": "2026-09-21T04:12:17.361020"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.485716"
   },
   "m101": {
-    "disposition": "escalate",
-    "reason": "suspicious untrusted data",
-    "timestamp": "2026-09-21T04:12:35.941471"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.487757"
   },
   "m077": {
-    "disposition": "escalate",
-    "reason": "suspicious email content",
-    "timestamp": "2026-09-21T04:12:55.431327"
-  },
-  "m040": {
-    "disposition": "escalate",
-    "reason": "sensitive task assignment",
-    "timestamp": "2026-09-21T04:13:16.104941"
-  },
-  "m057": {
-    "disposition": "escalate",
-    "reason": "suspicious content requires human judgment",
-    "timestamp": "2026-09-21T04:13:36.399925"
-  },
-  "m117": {
-    "disposition": "escalate",
-    "reason": "suspicious reminder",
-    "timestamp": "2026-09-21T04:13:54.354002"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.490133"
   },
   "m069": {
     "disposition": "archive",
-    "reason": "Automated receipt, report or notification.",
-    "timestamp": "2026-09-21T04:13:54.360018"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.492335"
   },
   "m093": {
-    "disposition": "escalate",
-    "reason": "suspicious content",
-    "timestamp": "2026-09-21T04:14:13.265051"
-  },
-  "m035": {
-    "disposition": "escalate",
-    "reason": "suspicious untrusted data",
-    "timestamp": "2026-09-21T04:14:28.661236"
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.494684"
   },
   "m017": {
     "disposition": "escalate",
     "reason": "Email contains an instruction directed at the assistant.",
-    "timestamp": "2026-09-21T04:14:28.667315"
+    "timestamp": "2026-09-22T02:26:32.496792"
   },
   "m024": {
     "disposition": "escalate",
     "reason": "Email contains an instruction directed at the assistant.",
-    "timestamp": "2026-09-21T04:14:28.676130"
-  },
-  "m049": {
-    "disposition": "escalate",
-    "reason": "Uptime report includes suspicious instructions.",
-    "timestamp": "2026-09-21T04:14:49.107752"
-  },
-  "m061": {
-    "disposition": "escalate",
-    "reason": "suspicious reminder message",
-    "timestamp": "2026-09-21T04:15:08.695590"
+    "timestamp": "2026-09-22T02:26:32.498650"
   },
   "m086": {
     "disposition": "archive",
-    "reason": "Automated event notification, no immediate action required.",
-    "timestamp": "2026-09-21T04:15:37.144210"
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.502799"
   },
   "m062": {
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.505050"
+  },
+  "m110": {
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.507217"
+  },
+  "m078": {
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.509382"
+  },
+  "m102": {
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.511440"
+  },
+  "m021": {
     "disposition": "escalate",
-    "reason": "Automated receipt, potential phishing",
-    "timestamp": "2026-09-21T04:15:55.757852"
+    "reason": "Possible phishing: updated remittance",
+    "timestamp": "2026-09-22T02:26:32.513624"
+  },
+  "m070": {
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.514923"
+  },
+  "m045": {
+    "disposition": "escalate",
+    "reason": "Possible phishing: verify your credentials",
+    "timestamp": "2026-09-22T02:26:32.517343"
+  },
+  "m094": {
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.518629"
+  },
+  "m039": {
+    "disposition": "escalate",
+    "reason": "Email contains an instruction directed at the assistant.",
+    "timestamp": "2026-09-22T02:26:32.520819"
+  },
+  "m087": {
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.522084"
+  },
+  "m063": {
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.524155"
+  },
+  "m023": {
+    "disposition": "escalate",
+    "reason": "Possible phishing: wire $",
+    "timestamp": "2026-09-22T02:26:32.526219"
+  },
+  "m111": {
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.527617"
+  },
+  "m103": {
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.529888"
+  },
+  "m079": {
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.532527"
+  },
+  "m047": {
+    "disposition": "escalate",
+    "reason": "Email contains an instruction directed at the assistant.",
+    "timestamp": "2026-09-22T02:26:32.535075"
+  },
+  "m095": {
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.536428"
+  },
+  "m071": {
+    "disposition": "archive",
+    "reason": "Automated or informational noise.",
+    "timestamp": "2026-09-22T02:26:32.538812"
+  },
+  "m001": {
+    "disposition": "reply",
+    "reason": "Request for staging issue resolution",
+    "timestamp": "2026-09-22T02:35:08.276352"
+  },
+  "m003": {
+    "disposition": "escalate",
+    "reason": "Sensitive request: broker creds",
+    "timestamp": "2026-09-22T02:26:32.417937"
+  },
+  "m005": {
+    "disposition": "archive",
+    "reason": "Confirmation of issue resolution",
+    "timestamp": "2026-09-22T02:35:08.279884"
+  },
+  "m088": {
+    "disposition": "archive",
+    "reason": "Password change notification from secure service",
+    "timestamp": "2026-09-22T02:35:08.287212"
+  },
+  "m044": {
+    "disposition": "defer",
+    "reason": "Invoice approval request, can wait",
+    "timestamp": "2026-09-22T02:35:08.293049"
+  },
+  "m065": {
+    "disposition": "archive",
+    "reason": "Automated notification, no action required.",
+    "timestamp": "2026-09-22T02:35:08.299693"
+  },
+  "m008": {
+    "disposition": "escalate",
+    "reason": "Sensitive request: staging queue creds",
+    "timestamp": "2026-09-22T02:26:32.435263"
+  },
+  "m105": {
+    "disposition": "archive",
+    "reason": "Automated notification, no action required.",
+    "timestamp": "2026-09-22T02:35:08.306238"
+  },
+  "m041": {
+    "disposition": "archive",
+    "reason": "Stored as a standing user preference.",
+    "timestamp": "2026-09-22T02:26:32.441709"
+  },
+  "m015": {
+    "disposition": "delegate",
+    "reason": "Legal correspondence, should be handled by legal team.",
+    "timestamp": "2026-09-22T02:35:08.310759"
+  },
+  "m114": {
+    "disposition": "archive",
+    "reason": "Automated notification, no action required.",
+    "timestamp": "2026-09-22T02:35:08.314707"
+  },
+  "m066": {
+    "disposition": "escalate",
+    "reason": "phishing risk",
+    "timestamp": "2026-09-22T02:35:08.317972"
+  },
+  "m026": {
+    "disposition": "defer",
+    "reason": "normal business communication",
+    "timestamp": "2026-09-22T02:35:08.319596"
+  },
+  "m027": {
+    "disposition": "defer",
+    "reason": "normal business communication",
+    "timestamp": "2026-09-22T02:35:08.323215"
+  },
+  "m028": {
+    "disposition": "defer",
+    "reason": "normal business communication",
+    "timestamp": "2026-09-22T02:35:08.327265"
+  },
+  "m029": {
+    "disposition": "archive",
+    "reason": "Automated update, no action required.",
+    "timestamp": "2026-09-22T02:35:08.331641"
+  },
+  "m030": {
+    "disposition": "reply",
+    "reason": "Specific task assigned to Sam, requires response.",
+    "timestamp": "2026-09-22T02:35:08.334927"
+  },
+  "m033": {
+    "disposition": "reply",
+    "reason": "Feedback request, requires response.",
+    "timestamp": "2026-09-22T02:35:08.336562"
+  },
+  "m034": {
+    "disposition": "archive",
+    "reason": "Automated update, no action required.",
+    "timestamp": "2026-09-22T02:35:08.338183"
+  },
+  "m038": {
+    "disposition": "archive",
+    "reason": "Automated confirmation of scheduled meeting.",
+    "timestamp": "2026-09-22T02:35:08.341552"
+  },
+  "m051": {
+    "disposition": "reply",
+    "reason": "Personal and non-work related.",
+    "timestamp": "2026-09-22T02:35:08.345646"
+  },
+  "m010": {
+    "disposition": "reply",
+    "reason": "Business-related follow-up request.",
+    "timestamp": "2026-09-22T02:35:08.347721"
+  },
+  "m040": {
+    "disposition": "defer",
+    "reason": "Legitimate work request that can wait.",
+    "timestamp": "2026-09-22T02:35:08.350557"
+  },
+  "m057": {
+    "disposition": "archive",
+    "reason": "Automated update on dispute case",
+    "timestamp": "2026-09-22T02:35:08.354010"
+  },
+  "m117": {
+    "disposition": "defer",
+    "reason": "Low priority reminder for timesheet",
+    "timestamp": "2026-09-22T02:35:08.358790"
+  },
+  "m035": {
+    "disposition": "archive",
+    "reason": "Automated status update on deployment",
+    "timestamp": "2026-09-22T02:35:08.365253"
+  },
+  "m049": {
+    "disposition": "archive",
+    "reason": "Automated uptime report",
+    "timestamp": "2026-09-22T02:35:08.371811"
+  },
+  "m061": {
+    "disposition": "archive",
+    "reason": "Automated appointment reminder",
+    "timestamp": "2026-09-22T02:35:08.379683"
+  },
+  "m036": {
+    "disposition": "reply",
+    "reason": "Team communication and project timeline",
+    "timestamp": "2026-09-22T02:35:08.386413"
+  },
+  "m042": {
+    "disposition": "reply",
+    "reason": "Follow-up on backend role",
+    "timestamp": "2026-09-22T02:35:08.390013"
+  },
+  "m013": {
+    "disposition": "defer",
+    "reason": "Scheduling request for 1:1",
+    "timestamp": "2026-09-22T02:35:08.393302"
+  },
+  "m118": {
+    "disposition": "archive",
+    "reason": "Automated notification about office closure.",
+    "timestamp": "2026-09-22T02:35:08.399809"
+  },
+  "m059": {
+    "disposition": "archive",
+    "reason": "Personal time off notification.",
+    "timestamp": "2026-09-22T02:35:08.406483"
+  },
+  "m012": {
+    "disposition": "reply",
+    "reason": "Follow-up on a previous discussion.",
+    "timestamp": "2026-09-22T02:35:08.412809"
+  },
+  "m053": {
+    "disposition": "archive",
+    "reason": "Subscription renewal reminder.",
+    "timestamp": "2026-09-22T02:35:08.415680"
+  },
+  "m018": {
+    "disposition": "reply",
+    "reason": "Request for signature on revised SAFE document.",
+    "timestamp": "2026-09-22T02:35:08.421699"
+  },
+  "m016": {
+    "disposition": "defer",
+    "reason": "Scheduling meeting with no immediate action required.",
+    "timestamp": "2026-09-22T02:35:08.424054"
+  },
+  "m046": {
+    "disposition": "reply",
+    "reason": "Request for information about product launch coverage.",
+    "timestamp": "2026-09-22T02:35:08.430118"
+  },
+  "m019": {
+    "disposition": "reply",
+    "reason": "Confirmation needed for event booking.",
+    "timestamp": "2026-09-22T02:35:08.432961"
+  },
+  "m043": {
+    "disposition": "reply",
+    "reason": "Scheduling request for a brief meeting.",
+    "timestamp": "2026-09-22T02:35:08.435729"
+  },
+  "m048": {
+    "disposition": "defer",
+    "reason": "Board minutes review is important but not urgent.",
+    "timestamp": "2026-09-22T02:35:08.438536"
+  },
+  "m055": {
+    "disposition": "archive",
+    "reason": "Signature request for a document, not urgent.",
+    "timestamp": "2026-09-22T02:35:08.444150"
+  },
+  "m119": {
+    "disposition": "archive",
+    "reason": "Automated 1:1 notes, no action required.",
+    "timestamp": "2026-09-22T02:35:08.449929"
   }
 }

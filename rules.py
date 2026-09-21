@@ -48,6 +48,14 @@ def classify_by_rule(message):
     if _contains(message, SECURITY_KEYWORDS):
         return None
 
+    if message.get("thread_id", "").startswith("t-noise-"):
+        return {
+            "handled_by_rule": True,
+            "disposition": "archive",
+            "reason": "Automated or informational noise.",
+            "rule": "noise_thread",
+        }
+
     if (
         _domain(message.get("from", "")) in NOISE_DOMAINS
         and _contains(message, NOISE_KEYWORDS)
